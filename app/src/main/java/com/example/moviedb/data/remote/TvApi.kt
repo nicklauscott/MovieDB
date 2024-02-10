@@ -29,10 +29,4 @@ interface TvApi {
         @Path("season_number") seasonNumber: Int,
         @Query("api_key") apiKey: String = MovieApi.API_KEY
     ): EpisodeListDto
-
-    companion object {
-        const val BASE_URL = "https://api.themoviedb.org/3/"
-        const val BASE_IMAGE_URL = "https://image.tmdb.org/t/p/w500"
-        const val API_KEY = ""
-    }
 }

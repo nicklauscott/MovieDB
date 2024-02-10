@@ -6,6 +6,11 @@ import com.example.moviedb.data.local.MovieDatabase
 import com.example.moviedb.data.remote.MovieApi
 import com.example.moviedb.data.remote.TvApi
 import com.example.moviedb.data.cache.CacheManger
+import com.example.moviedb.domain.repository.MovieRepository
+import com.example.moviedb.domain.repository.TvShowRepository
+import com.example.moviedb.domain.usecase.GetMovieList
+import com.example.moviedb.domain.usecase.GetTvShowList
+import com.example.moviedb.domain.usecase.HomeScreenUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -66,4 +71,29 @@ object AppModule {
         return CacheManger()
     }
 
+    // use cases
+    @Singleton
+    @Provides
+    fun provideGetMovieListUsecase(movieRepository: MovieRepository): GetMovieList{
+        return GetMovieList(movieRepository)
+    }
+
+    @Singleton
+    @Provides
+    fun provideGetMTvShowListUsecase(tvShowRepository: TvShowRepository): GetTvShowList{
+        return GetTvShowList(tvShowRepository)
+    }
+
+    @Singleton
+    @Provides
+    fun provideHomeScreenUsecase(
+        getMovieList: GetMovieList, getTvShowList: GetTvShowList
+    ): HomeScreenUseCase = HomeScreenUseCase(getMovieList, getTvShowList)
+
 }
+
+
+
+
+
+

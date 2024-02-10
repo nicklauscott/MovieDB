@@ -8,8 +8,12 @@ import com.example.moviedb.data.remote.MovieApi
 import com.example.moviedb.domain.model.Movie
 import com.example.moviedb.domain.repository.MovieRepository
 import com.example.moviedb.util.Resource
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.launch
 import okio.IOException
 import retrofit2.HttpException
 import javax.inject.Inject
@@ -24,14 +28,13 @@ class MovieRepositoryImpl @Inject constructor(
         page: Int
     ): Flow<Resource<List<Movie>>> {
         return flow {
-            Log.d("TestViewModel-TestViewModel", "movieRepo - Requesting")
             emit(Resource.Loading(isLoading = true))
-            val localMovieList = movieDatabase.movieDao.getAllMovieByCategory(category)
+            val localMovieList = CoroutineScope(Dispatchers.IO).async { movieDatabase.movieDao.getAllMovieByCategory(category) }
 
-            val loadLocalMove = localMovieList.isNotEmpty() && !forceFetchFromRemote
+            val loadLocalMove = localMovieList.await().isNotEmpty() && !forceFetchFromRemote
 
             if (loadLocalMove) {
-                emit(Resource.Success(localMovieList.map { movieEntity ->
+                emit(Resource.Success(localMovieList.await().map { movieEntity ->
                         movieEntity.toMovie(category)
                     }
                 ))
@@ -62,7 +65,7 @@ class MovieRepositoryImpl @Inject constructor(
                     movieDto.toMovieEntity(category) }
             }
 
-            movieDatabase.movieDao.upsertMovieList(movieEntities)
+            CoroutineScope(Dispatchers.IO).launch { movieDatabase.movieDao.upsertMovieList(movieEntities) }
             emit(Resource.Success(movieEntities.map { it.toMovie(category) }))
             emit(Resource.Loading(isLoading = false))
         }

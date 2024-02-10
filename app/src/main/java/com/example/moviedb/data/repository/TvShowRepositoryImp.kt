@@ -45,12 +45,12 @@ class TvShowRepositoryImp @Inject constructor(
     ): Flow<Resource<List<TvShow>>> {
         return flow {
             emit(Resource.Loading(isLoading = true))
-            val localTvList = movieDatabase.tvDao.getAllTvByCategory(category)
+            val localTvList = CoroutineScope(Dispatchers.Default).async { movieDatabase.tvDao.getAllTvByCategory(category) }
 
-            val loadLocalMove = localTvList.isNotEmpty() && !forceFetchFromRemote
+            val loadLocalMove = localTvList.await().isNotEmpty() && !forceFetchFromRemote
 
             if (loadLocalMove) {
-                emit(Resource.Success(localTvList.map { tvEntity ->
+                emit(Resource.Success(localTvList.await().map { tvEntity ->
                     tvEntity.toTvShow(category)
                 }
                 ))
@@ -81,7 +81,7 @@ class TvShowRepositoryImp @Inject constructor(
                     tvDto.toTvEntity(category) }
             }
 
-            movieDatabase.tvDao.upsertTvList(movieEntities)
+            CoroutineScope(Dispatchers.Default).launch { movieDatabase.tvDao.upsertTvList(movieEntities) }
             emit(Resource.Success(movieEntities.map { it.toTvShow(category) }))
             emit(Resource.Loading(isLoading = false))
         }
