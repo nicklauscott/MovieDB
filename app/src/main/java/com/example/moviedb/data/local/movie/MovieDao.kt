@@ -17,6 +17,13 @@ interface MovieDao {
     @Query("SELECT * FROM movie WHERE category =:category")
     fun getAllMovieByCategory(category: String): List<MovieEntity>
 
+    @Query("SELECT * FROM movie WHERE inMyList =:favorite")
+    fun getAllMovieInMyList(favorite: Boolean = true): Flow<List<MovieEntity>>
 
+    @Upsert
+    suspend fun upsertMovie(movieEntity: MovieEntity)
+
+    @Query("SELECT * FROM movie WHERE title LIKE :searchQuery")
+    fun searchMovieByName(searchQuery: String): List<MovieEntity>
 
 }

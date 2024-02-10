@@ -2,8 +2,10 @@ package com.example.moviedb.di
 
 import android.content.Context
   import androidx.room.Room
-import com.example.moviedb.data.local.movie.MovieDatabase
+import com.example.moviedb.data.local.MovieDatabase
 import com.example.moviedb.data.remote.MovieApi
+import com.example.moviedb.data.remote.TvApi
+import com.example.moviedb.data.cache.CacheManger
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -38,14 +40,30 @@ object AppModule {
             .create(MovieApi::class.java)
     }
 
+    @Provides
+    fun provideTvApi(): TvApi{
+        return Retrofit.Builder()
+            .addConverterFactory(GsonConverterFactory.create())
+            .baseUrl(MovieApi.BASE_URL)
+            .client(client)
+            .build()
+            .create(TvApi::class.java)
+    }
+
     @Singleton
     @Provides
-    fun provideDataBase(@ApplicationContext context: Context): MovieDatabase{
+    fun provideDataBase(@ApplicationContext context: Context): MovieDatabase {
         return Room.databaseBuilder(
             context,
             MovieDatabase::class.java,
             "movie.db"
         ).build()
+    }
+
+    @Singleton
+    @Provides
+    fun provideCacheManger(): CacheManger {
+        return CacheManger()
     }
 
 }

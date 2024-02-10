@@ -1,7 +1,9 @@
 package com.example.moviedb.di
 
 import com.example.moviedb.data.repository.MovieRepositoryImpl
+import com.example.moviedb.data.repository.TvShowRepositoryImp
 import com.example.moviedb.domain.repository.MovieRepository
+import com.example.moviedb.domain.repository.TvShowRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -17,4 +19,10 @@ abstract class RepositoryModule {
     abstract fun bindMovieRepository(
         movieRepositoryImpl: MovieRepositoryImpl
     ): MovieRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindTvRepository(
+        tvShowRepositoryImp: TvShowRepositoryImp
+    ): TvShowRepository
 }

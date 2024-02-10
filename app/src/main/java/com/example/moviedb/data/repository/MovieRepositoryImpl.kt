@@ -1,6 +1,7 @@
 package com.example.moviedb.data.repository
 
-import com.example.moviedb.data.local.movie.MovieDatabase
+import android.util.Log
+import com.example.moviedb.data.local.MovieDatabase
 import com.example.moviedb.data.mapper.toMovie
 import com.example.moviedb.data.mapper.toMovieEntity
 import com.example.moviedb.data.remote.MovieApi
@@ -23,6 +24,7 @@ class MovieRepositoryImpl @Inject constructor(
         page: Int
     ): Flow<Resource<List<Movie>>> {
         return flow {
+            Log.d("TestViewModel-TestViewModel", "movieRepo - Requesting")
             emit(Resource.Loading(isLoading = true))
             val localMovieList = movieDatabase.movieDao.getAllMovieByCategory(category)
 

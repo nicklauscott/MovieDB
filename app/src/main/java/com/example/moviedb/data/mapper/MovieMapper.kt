@@ -24,8 +24,7 @@ fun MovieDto.toMovieEntity(category: String): MovieEntity =
             genre_ids?.joinToString(",") ?: "-1,-2"
         }catch (ex: Exception) {
             "-1,-2"
-        },
-
+        }
     )
 
 
