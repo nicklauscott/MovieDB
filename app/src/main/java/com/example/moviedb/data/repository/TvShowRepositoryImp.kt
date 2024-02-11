@@ -1,6 +1,8 @@
 package com.example.moviedb.data.repository
 
 import android.util.Log
+import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.asLiveData
 import com.example.moviedb.data.cache.CacheManger
 import com.example.moviedb.data.cache.Season
 import com.example.moviedb.data.cache.TvShowModel
@@ -22,6 +24,8 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.joinAll
@@ -233,8 +237,7 @@ class TvShowRepositoryImp @Inject constructor(
         return flow {
             emit(Resource.Loading(isLoading = true))
 
-            val myList = movieDatabase.tvDao.getAllTvInMyList(true)
-            myList.collectLatest { tvList ->
+            movieDatabase.tvDao.getAllTvInMyList(true).collect { tvList ->
                 emit(Resource.Success(tvList.map { it.toTvShow("") }))
                 emit(Resource.Loading(isLoading = false))
             }

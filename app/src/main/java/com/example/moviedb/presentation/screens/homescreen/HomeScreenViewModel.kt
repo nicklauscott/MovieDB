@@ -12,11 +12,8 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -28,15 +25,9 @@ class HomeScreenViewModel @Inject constructor(
     private var _homeScreenState = MutableStateFlow(HomeScreenState())
     val homeScreenState = _homeScreenState.asStateFlow()
 
-    //private var loadMoviesAndShowJOb: Job
+    private var job: Job? = null
 
     init {
-//        loadMoviesAndShowJOb = viewModelScope.launch {
-//            val job1 = launch { getMovies() }
-//            job1.join()
-//            getTvShows()
-//        }
-
         getMovies()
         getTvShows()
     }
@@ -44,7 +35,6 @@ class HomeScreenViewModel @Inject constructor(
     fun onEvent(event: HomeScreenUiEvent) {
         when (event) {
             HomeScreenUiEvent.Navigate -> {
-                //loadMoviesAndShowJOb.cancel()
                 _homeScreenState.update {
                     it.copy(
                         isMovieListScreen = !homeScreenState.value.isMovieListScreen
@@ -72,13 +62,11 @@ class HomeScreenViewModel @Inject constructor(
                         switchMovieCategory(event.category)
                     }
                     false -> {
-                        _homeScreenState.update { it.copy(category = event.category) }
+                        job?.cancel()
+                        _homeScreenState.update { it.copy(category = event.category, tvShowList = emptyList()) }
                         switchTvShowCategory(event.category)
                     }
                 }
-            }
-            is HomeScreenUiEvent.Search -> {
-                // TODO
             }
         }
     }
@@ -119,12 +107,13 @@ class HomeScreenViewModel @Inject constructor(
     }
 
     private fun switchTvShowCategory(category: Category) {
-        viewModelScope.launch(Dispatchers.IO) {
+        job = viewModelScope.launch {
             homeScreenUseCase.getTvShowList(
                 forceFetchFromRemote = true,
                 category = category,
                 page = 1
             ).collectLatest { result ->
+                Log.d("TestViewModel-TestViewModel", "result: ${result.data}")
                 when (result) {
                     is Resource.Error -> {
                         withContext(Dispatchers.Main) {
@@ -141,9 +130,8 @@ class HomeScreenViewModel @Inject constructor(
                             result.data?.let { tvList ->
                                 _homeScreenState.update {
                                     it.copy(
-                                        tvShowList = if (category ==  Category.MyList) tvList else
-                                            homeScreenState.value.tvShowList + tvList.shuffled(),
-                                        //isLoading = false
+                                        tvShowList = if (category != Category.MyList) homeScreenState.value.tvShowList + tvList.shuffled()
+                                            else tvList
                                     )
                                 }
                             }

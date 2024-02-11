@@ -15,6 +15,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.moviedb.presentation.navigation.Screens
+import com.example.moviedb.presentation.screens.homescreen.component.AppTopBar
 import com.example.moviedb.presentation.screens.homescreen.component.BottomNavigationBar
 import com.example.moviedb.presentation.screens.homescreen.innerscreens.MovieListScreen
 import com.example.moviedb.presentation.screens.homescreen.innerscreens.TvShowListScreen
@@ -24,7 +25,7 @@ import com.example.moviedb.presentation.screens.homescreen.innerscreens.TvShowLi
 fun HomeScreen(navController: NavController) {
 
     val homeScreenViewModel = hiltViewModel<HomeScreenViewModel>()
-    val movieListState = homeScreenViewModel.homeScreenState.collectAsState().value
+    val homeScreenState = homeScreenViewModel.homeScreenState.collectAsState().value
     val bottomNavController = rememberNavController()
 
     Scaffold(bottomBar = {
@@ -32,7 +33,10 @@ fun HomeScreen(navController: NavController) {
             bottomNavController = bottomNavController, onEvent = homeScreenViewModel::onEvent
         )
     }, topBar = {
-        // custom top app bar
+        AppTopBar(homeScreenState = homeScreenState,
+            onChangeCategory = homeScreenViewModel::onEvent) {
+            navController.navigate(Screens.Search.route)
+        }
     }) {
 
         Box(
@@ -47,14 +51,14 @@ fun HomeScreen(navController: NavController) {
                 composable(Screens.MovieList.route) {
                     MovieListScreen(
                         navController = navController,
-                        homeScreenState = movieListState,
+                        homeScreenState = homeScreenState,
                         onEvent = homeScreenViewModel::onEvent
                     )
                 }
                 composable(Screens.TvShowLIst.route) {
                     TvShowListScreen(
                         navController = navController,
-                        homeScreenState = movieListState,
+                        homeScreenState = homeScreenState,
                         onEvent = homeScreenViewModel::onEvent
                     )
                 }

@@ -49,8 +49,6 @@ fun MovieListScreen(
                 )
                 Spacer(modifier = Modifier.height(16.dp))
 
-                Log.d("TestViewModel-TestViewModel", "movieScreen: $homeScreenState")
-                Log.d("TestViewModel-TestViewModel", "can paginate: ${index >= homeScreenState.movieList.size - 1 && !homeScreenState.isLoading}")
                 if (index >= homeScreenState.movieList.size - 1 && !homeScreenState.isLoading) {
                     onEvent(HomeScreenUiEvent.Paginate(homeScreenState.category))
                 }
