@@ -12,11 +12,13 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
 import androidx.compose.ui.unit.dp
 import com.example.moviedb.presentation.component.CategorySpinner
 import com.example.moviedb.presentation.screens.homescreen.HomeScreenState
@@ -26,12 +28,11 @@ import com.example.moviedb.util.Category
 @Composable
 fun AppTopBar(
     homeScreenState: HomeScreenState,
-    onChangeCategory: (HomeScreenUiEvent) -> Unit,
+    currentCategory: State<Category>,
+    onChangeCategory: (Category) -> Unit,
     onClickSearch: () -> Unit
 ) {
-    val currentCategory = remember {
-        mutableStateOf(homeScreenState.category.uiValue)
-    }
+
 
     Surface(
         modifier = Modifier
@@ -48,10 +49,13 @@ fun AppTopBar(
         ) {
             // category spinner
             CategorySpinner(
-                items = Category.values(), currentCategory = currentCategory.value
+                modifier = Modifier,
+                items = Category.values(),
+                isMovieScreen = homeScreenState.isMovieListScreen,
+                currentCategory = currentCategory.value.uiValue
             ) { selectedCategory ->
-                currentCategory.value = selectedCategory.uiValue
-                onChangeCategory(HomeScreenUiEvent.SwitchCategory(selectedCategory))
+                //currentCategory.value = selectedCategory.uiValue
+                onChangeCategory(selectedCategory)
             }
 
             // search icon

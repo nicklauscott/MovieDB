@@ -25,11 +25,27 @@ class HomeScreenViewModel @Inject constructor(
     private var _homeScreenState = MutableStateFlow(HomeScreenState())
     val homeScreenState = _homeScreenState.asStateFlow()
 
-    private var job: Job? = null
-
     init {
-        getMovies()
-        getTvShows()
+        viewModelScope.launch {
+            homeScreenUseCase.getMovieList(true, homeScreenState.value.category, 1) { result ->
+                result?.let { movieList ->
+                    _homeScreenState.update {
+                        it.copy(
+                            movieList = homeScreenState.value.movieList + movieList.shuffled(),
+                            movieListPage = 1,
+                        )
+                    }
+                }
+            }
+
+            homeScreenUseCase.getTvShowList(true, homeScreenState.value.category, 1) { result ->
+                result?.let { tvList ->
+                    _homeScreenState.update {
+                        it.copy(tvShowList = tvList, tvListPage = 1)
+                    }
+                }
+            }
+        }
     }
 
     fun onEvent(event: HomeScreenUiEvent) {
@@ -37,20 +53,82 @@ class HomeScreenViewModel @Inject constructor(
             HomeScreenUiEvent.Navigate -> {
                 _homeScreenState.update {
                     it.copy(
-                        isMovieListScreen = !homeScreenState.value.isMovieListScreen
+                        isMovieListScreen = !homeScreenState.value.isMovieListScreen,
+                        category = Category.Popular
                     )
+                }
+
+                // load selected category
+                if (homeScreenState.value.isMovieListScreen) {
+                    _homeScreenState.update {
+                        it.copy(
+                            movieList = emptyList(),
+                            movieListPage = 1,
+                        )
+                    }
+                    viewModelScope.launch {
+                        homeScreenUseCase.getMovieList(true, homeScreenState.value.category, 1) { result ->
+                            result?.let { movieList ->
+                                _homeScreenState.update {
+                                    it.copy(
+                                        movieList = homeScreenState.value.movieList + movieList.shuffled(),
+                                        movieListPage = 1,
+                                    )
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    _homeScreenState.update {
+                        it.copy(tvShowList = emptyList(), tvListPage = 1)
+                    }
+                    viewModelScope.launch {
+                        homeScreenUseCase.getTvShowList(true, homeScreenState.value.category, 1) { result ->
+                            result?.let { tvList ->
+                                _homeScreenState.update {
+                                    it.copy(tvShowList = tvList, tvListPage = 1)
+                                }
+                            }
+                        }
+                    }
                 }
             }
             is HomeScreenUiEvent.Paginate -> {
                 when (_homeScreenState.value.isMovieListScreen) {
                     true ->  {
                         if (homeScreenState.value.category != Category.MyList) {
-                            getMovies(homeScreenState.value.movieListPage + 1)
+                            //getMovies(homeScreenState.value.movieListPage + 1)
+                            viewModelScope.launch {
+                                homeScreenUseCase.getMovieList(
+                                    true, homeScreenState.value.category,
+                                    homeScreenState.value.movieListPage + 1) { result ->
+                                    result?.let { movieList ->
+                                        _homeScreenState.update {
+                                            it.copy(
+                                                movieList = homeScreenState.value.movieList + movieList.shuffled(),
+                                                movieListPage = homeScreenState.value.movieListPage + 1,
+                                            )
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
                     false -> {
                         if (homeScreenState.value.category != Category.MyList) {
-                            getTvShows(homeScreenState.value.movieListPage + 1)
+                            //getTvShows(homeScreenState.value.movieListPage + 1)
+                            viewModelScope.launch {
+                                homeScreenUseCase.getTvShowList(
+                                    true, homeScreenState.value.category,
+                                    homeScreenState.value.tvListPage + 1) { result ->
+                                    result?.let { tvList ->
+                                        _homeScreenState.update {
+                                            it.copy(tvShowList = homeScreenState.value.tvShowList + tvList.shuffled(),
+                                                tvListPage = homeScreenState.value.tvListPage + 1)
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -58,159 +136,33 @@ class HomeScreenViewModel @Inject constructor(
             is HomeScreenUiEvent.SwitchCategory -> {
                 when (_homeScreenState.value.isMovieListScreen) {
                     true ->  {
-                        _homeScreenState.update { it.copy(category = event.category) }
-                        switchMovieCategory(event.category)
+                        _homeScreenState.update { it.copy(category = event.category, movieList = emptyList()) }
+                        viewModelScope.launch {
+                            homeScreenUseCase.getMovieList(
+                                true, event.category,
+                                1) { result ->
+                                result?.let { movieList ->
+                                    _homeScreenState.update {
+                                        it.copy(
+                                            movieList = homeScreenState.value.movieList + movieList.shuffled(),
+                                            movieListPage = homeScreenState.value.movieListPage + 1,
+                                        )
+                                    }
+                                }
+                            }
+                        }
                     }
                     false -> {
-                        job?.cancel()
                         _homeScreenState.update { it.copy(category = event.category, tvShowList = emptyList()) }
-                        switchTvShowCategory(event.category)
-                    }
-                }
-            }
-        }
-    }
-
-    private fun switchMovieCategory(category: Category) {
-        viewModelScope.launch(Dispatchers.IO) {
-            homeScreenUseCase.getMovieList(
-                forceFetchFromRemote = true,
-                category = category,
-                page = 1
-            ).collectLatest { result ->
-                when (result) {
-                    is Resource.Error -> {
-                        withContext(Dispatchers.Main) {
-                            _homeScreenState.update { it.copy(isLoading = false) }
-                        }
-                    }
-                    is Resource.Loading -> {
-                        withContext(Dispatchers.Main) {
-                            _homeScreenState.update { it.copy(isLoading = result.isLoading) }
-                        }
-                    }
-                    is Resource.Success -> {
-                        withContext(Dispatchers.Main) {
-                            result.data?.let { movieList ->
-                                _homeScreenState.update {
-                                    it.copy(
-                                        movieList = homeScreenState.value.movieList + movieList.shuffled(),
-                                        //isLoading = false
-                                    )
+                        viewModelScope.launch {
+                            homeScreenUseCase.getTvShowList(
+                                true, event.category, 1) { result ->
+                                result?.let { tvList ->
+                                    _homeScreenState.update {
+                                        it.copy(tvShowList = homeScreenState.value.tvShowList + tvList.shuffled(),
+                                            tvListPage = 1)
+                                    }
                                 }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    private fun switchTvShowCategory(category: Category) {
-        job = viewModelScope.launch {
-            homeScreenUseCase.getTvShowList(
-                forceFetchFromRemote = true,
-                category = category,
-                page = 1
-            ).collectLatest { result ->
-                Log.d("TestViewModel-TestViewModel", "result: ${result.data}")
-                when (result) {
-                    is Resource.Error -> {
-                        withContext(Dispatchers.Main) {
-                            _homeScreenState.update { it.copy(isLoading = false) }
-                        }
-                    }
-                    is Resource.Loading -> {
-                        withContext(Dispatchers.Main) {
-                            _homeScreenState.update { it.copy(isLoading = result.isLoading) }
-                        }
-                    }
-                    is Resource.Success -> {
-                        withContext(Dispatchers.Main) {
-                            result.data?.let { tvList ->
-                                _homeScreenState.update {
-                                    it.copy(
-                                        tvShowList = if (category != Category.MyList) homeScreenState.value.tvShowList + tvList.shuffled()
-                                            else tvList
-                                    )
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    private fun getMovies(page: Int = 1) {
-        viewModelScope.launch {
-            homeScreenUseCase.getMovieList(
-                forceFetchFromRemote = true,
-                category = homeScreenState.value.category,
-                page = page
-            ).collectLatest { result ->
-                when (result) {
-                    is Resource.Success -> {
-                        withContext(Dispatchers.Main) {
-                            result.data?.let { movieList ->
-                                _homeScreenState.update {
-                                    it.copy(
-                                        movieList = homeScreenState.value.movieList + movieList.shuffled(),
-                                        movieListPage = page,
-                                        //isLoading = false
-                                    )
-                                }
-                            }
-                        }
-                    }
-                    is Resource.Error -> {
-                        withContext(Dispatchers.Main) {
-                            _homeScreenState.update { it.copy(isLoading = false) }
-                        }
-                    }
-                    is Resource.Loading -> {
-                        withContext(Dispatchers.Main) {
-                            _homeScreenState.update { it.copy(isLoading = result.isLoading) }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    private fun getTvShows(page: Int = 1) {
-        viewModelScope.launch {
-            homeScreenUseCase.getTvShowList(
-                forceFetchFromRemote = true,
-                category = homeScreenState.value.category,
-                page = page
-            ).collectLatest { result ->
-                when (result) {
-                    is Resource.Success -> {
-                        withContext(Dispatchers.Main) {
-                            result.data?.let { tvList ->
-                                _homeScreenState.update {
-                                    it.copy(
-                                        tvShowList = homeScreenState.value.tvShowList + tvList.shuffled(),
-                                        //tvListPage = page
-                                    )
-                                }
-                            }
-                        }
-                    }
-                    is Resource.Error -> {
-                        // let get movies handle loading states at the beginning
-                        if (page != 1) {
-                            withContext(Dispatchers.Main) {
-                                _homeScreenState.update { it.copy(isLoading = false) }
-                            }
-                        }
-                    }
-                    is Resource.Loading -> {
-                        // let get movies handle loading states at the beginning
-                        if (page != 1) {
-                            withContext(Dispatchers.Main) {
-                                _homeScreenState.update { it.copy(isLoading = result.isLoading) }
                             }
                         }
                     }

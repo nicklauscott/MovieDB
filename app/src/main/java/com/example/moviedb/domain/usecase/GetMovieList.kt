@@ -10,9 +10,23 @@ import javax.inject.Inject
 class GetMovieList @Inject constructor(
     private val movieRepository: MovieRepository
 ) {
+
     suspend operator fun invoke(
-        forceFetchFromRemote: Boolean, category: Category, page: Int): Flow<Resource<List<Movie>>> {
-        return movieRepository.getMovieList(forceFetchFromRemote, category.value, page)
+        forceFetchFromRemote: Boolean, category: Category, page: Int,
+        movies: (List<Movie>?) -> Unit
+    ) {
+        when (category) {
+            Category.MyList -> {
+                movieRepository.getMoviesInMyList().collect {
+                    movies(it.data)
+                }
+            }
+            else -> {
+                movieRepository.getMovieList(forceFetchFromRemote, category.value, page).collect {
+                    movies(it.data)
+                }
+            }
+        }
     }
 
 }

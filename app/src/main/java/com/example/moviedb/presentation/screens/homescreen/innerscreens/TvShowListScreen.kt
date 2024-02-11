@@ -44,7 +44,7 @@ fun TvShowListScreen(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(text = "Your list is empty",
-                        fontSize = 18.sp, style = MaterialTheme.typography.headlineMedium)
+                        fontSize = 23.sp, style = MaterialTheme.typography.headlineMedium)
 
                 }
             }

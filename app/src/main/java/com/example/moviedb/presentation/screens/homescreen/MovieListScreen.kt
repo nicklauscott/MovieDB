@@ -8,6 +8,8 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
@@ -19,8 +21,8 @@ import com.example.moviedb.presentation.screens.homescreen.component.AppTopBar
 import com.example.moviedb.presentation.screens.homescreen.component.BottomNavigationBar
 import com.example.moviedb.presentation.screens.homescreen.innerscreens.MovieListScreen
 import com.example.moviedb.presentation.screens.homescreen.innerscreens.TvShowListScreen
+import com.example.moviedb.util.Category
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(navController: NavController) {
 
@@ -28,13 +30,27 @@ fun HomeScreen(navController: NavController) {
     val homeScreenState = homeScreenViewModel.homeScreenState.collectAsState().value
     val bottomNavController = rememberNavController()
 
+    val currentCategory = remember {
+        mutableStateOf(homeScreenState.category)
+    }
+
+
     Scaffold(bottomBar = {
         BottomNavigationBar(
-            bottomNavController = bottomNavController, onEvent = homeScreenViewModel::onEvent
+            bottomNavController = bottomNavController,
+            homeScreenState.isMovieListScreen,
+            onEvent = {
+                homeScreenViewModel.onEvent(HomeScreenUiEvent.Navigate)
+                currentCategory.value = Category.Popular
+            }
         )
     }, topBar = {
         AppTopBar(homeScreenState = homeScreenState,
-            onChangeCategory = homeScreenViewModel::onEvent) {
+            currentCategory = currentCategory,
+            onChangeCategory = {
+                currentCategory.value = it
+                homeScreenViewModel.onEvent(HomeScreenUiEvent.SwitchCategory(it))
+            }) {
             navController.navigate(Screens.Search.route)
         }
     }) {

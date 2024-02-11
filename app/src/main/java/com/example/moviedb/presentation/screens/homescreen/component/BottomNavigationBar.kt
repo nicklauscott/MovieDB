@@ -28,7 +28,9 @@ data class BottomItem(
 
 @Composable
 fun BottomNavigationBar(
-    bottomNavController: NavHostController, onEvent: (HomeScreenUiEvent) -> Unit
+    bottomNavController: NavHostController,
+    isMovieScreen: Boolean,
+    onEvent: () -> Unit
 ) {
 
     val items = listOf(
@@ -54,15 +56,19 @@ fun BottomNavigationBar(
                     selected.intValue = index
                     when (selected.intValue) {
                         0 -> {
-                            onEvent(HomeScreenUiEvent.Navigate)
-                            bottomNavController.popBackStack()
-                            bottomNavController.navigate(Screens.MovieList.route)
+                            if (!isMovieScreen) {
+                                onEvent()
+                                bottomNavController.popBackStack()
+                                bottomNavController.navigate(Screens.MovieList.route)
+                            }
                         }
 
                         1 -> {
-                            onEvent(HomeScreenUiEvent.Navigate)
-                            bottomNavController.popBackStack()
-                            bottomNavController.navigate(Screens.TvShowLIst.route)
+                            if (isMovieScreen) {
+                                onEvent()
+                                bottomNavController.popBackStack()
+                                bottomNavController.navigate(Screens.TvShowLIst.route)
+                            }
                         }
                     }
                 }, icon = {

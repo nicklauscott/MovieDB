@@ -4,6 +4,7 @@ import android.util.Log
 import com.example.moviedb.data.local.MovieDatabase
 import com.example.moviedb.data.mapper.toMovie
 import com.example.moviedb.data.mapper.toMovieEntity
+import com.example.moviedb.data.mapper.toTvShow
 import com.example.moviedb.data.remote.MovieApi
 import com.example.moviedb.domain.model.Movie
 import com.example.moviedb.domain.repository.MovieRepository
@@ -83,6 +84,16 @@ class MovieRepositoryImpl @Inject constructor(
             }
             emit(Resource.Error(message = "No such movie"))
             emit(Resource.Loading(isLoading = false))
+        }
+    }
+
+    override suspend fun getMoviesInMyList(): Flow<Resource<List<Movie>>> {
+        return flow {
+            emit(Resource.Loading(isLoading = true))
+            movieDatabase.movieDao.getAllMovieInMyList(true).collect { movieList ->
+                emit(Resource.Success(movieList.map { it.toMovie("") }))
+                emit(Resource.Loading(isLoading = false))
+            }
         }
     }
 }
