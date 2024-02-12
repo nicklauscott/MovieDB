@@ -2,4 +2,6 @@
     <string name="app_name">MovieDB</string>
     <string name="movies">Movies</string>
     <string name="tvShows">Tv Shows</string>
+    <string name="first_air_date">First Air Date: </string>
+    <string name="votes">Votes: </string>
 </resources>

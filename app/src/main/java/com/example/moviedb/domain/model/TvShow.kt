@@ -17,6 +17,6 @@ data class TvShow(
     val poster_path: String,
     val vote_average: Double,
     val vote_count: Int,
-    val inMyList: Boolean = false,
+    val inMyList: Boolean? = false,
     val category: String
 )

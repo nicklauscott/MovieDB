@@ -1,11 +1,14 @@
 package com.example.moviedb.presentation.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.moviedb.presentation.screens.homescreen.HomeScreen
 import com.example.moviedb.presentation.screens.splash.SplashScreen
+import com.example.moviedb.presentation.screens.tvshowdetail.TvShowDetailScreen
 
 @Composable
 fun Navigation() {
@@ -17,6 +20,19 @@ fun Navigation() {
 
         composable(Screens.Home.route) {
             HomeScreen(navController = navController)
+        }
+
+        composable(
+            route = Screens.TvShowDetail.route + "/{show_id}",
+            arguments = listOf(
+                navArgument("show_id") {
+                    type = NavType.IntType
+                    defaultValue = -1
+                    nullable = false
+                }
+            )
+        ) {
+            TvShowDetailScreen(navController)
         }
     }
 }

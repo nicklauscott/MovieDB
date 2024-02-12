@@ -8,9 +8,14 @@ import com.example.moviedb.data.remote.TvApi
 import com.example.moviedb.data.cache.CacheManger
 import com.example.moviedb.domain.repository.MovieRepository
 import com.example.moviedb.domain.repository.TvShowRepository
+import com.example.moviedb.domain.usecase.AddToMyList
+import com.example.moviedb.domain.usecase.GetEpisodeLIst
 import com.example.moviedb.domain.usecase.GetMovieList
+import com.example.moviedb.domain.usecase.GetTvShowDetail
 import com.example.moviedb.domain.usecase.GetTvShowList
 import com.example.moviedb.domain.usecase.HomeScreenUseCase
+import com.example.moviedb.domain.usecase.RemoveFromMyList
+import com.example.moviedb.domain.usecase.TvDetailScreenUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -86,9 +91,45 @@ object AppModule {
 
     @Singleton
     @Provides
+    fun provideGetTvShowDetailUsecase(tvShowRepository: TvShowRepository): GetTvShowDetail{
+        return GetTvShowDetail(tvShowRepository)
+    }
+
+    @Singleton
+    @Provides
+    fun provideAddToMyListUsecase(movieRepository: MovieRepository,
+        tvShowRepository: TvShowRepository): AddToMyList{
+        return AddToMyList(movieRepository, tvShowRepository)
+    }
+
+    @Singleton
+    @Provides
+    fun provideRemoveFromMyListUsecase(movieRepository: MovieRepository,
+                                  tvShowRepository: TvShowRepository): RemoveFromMyList{
+        return RemoveFromMyList(movieRepository, tvShowRepository)
+    }
+
+    @Singleton
+    @Provides
+    fun provideGetEpisodeListUsecase(tvShowRepository: TvShowRepository): GetEpisodeLIst{
+        return GetEpisodeLIst(tvShowRepository)
+    }
+
+    @Singleton
+    @Provides
     fun provideHomeScreenUsecase(
         getMovieList: GetMovieList, getTvShowList: GetTvShowList
     ): HomeScreenUseCase = HomeScreenUseCase(getMovieList, getTvShowList)
+
+    @Singleton
+    @Provides
+    fun provideTvDetailScreenUsecase(
+        getTvShowDetail: GetTvShowDetail,
+        getEpisodeLIst: GetEpisodeLIst,
+        addToMyList: AddToMyList,
+        removeFromMyList: RemoveFromMyList
+    ): TvDetailScreenUseCase =
+        TvDetailScreenUseCase(getTvShowDetail, getEpisodeLIst, addToMyList, removeFromMyList)
 
 }
 

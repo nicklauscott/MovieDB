@@ -1,8 +1,6 @@
 package com.example.moviedb.data.repository
 
 import android.util.Log
-import androidx.compose.runtime.collectAsState
-import androidx.lifecycle.asLiveData
 import com.example.moviedb.data.cache.CacheManger
 import com.example.moviedb.data.cache.Season
 import com.example.moviedb.data.cache.TvShowModel
@@ -22,13 +20,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -91,105 +84,75 @@ class TvShowRepositoryImp @Inject constructor(
         }
     }
 
-    override suspend fun getAShow(tvShowId: Int): Flow<Resource<TvShow>> {
-        return flow {
-            // start loading
-            emit(Resource.Loading(isLoading = true))
+    override suspend fun getAShow(tvShowId: Int): Resource<TvShow>{
+        // get tvShow from cache
+        val tvInCache = cacheManager.getFromCache(tvShowId)
+        if (tvInCache != null) {
+            return (Resource.Success(tvInCache.tvEntity.toTvShow("")))
+        }
 
-            // get tvShow from cache
-            val tvInCache = cacheManager.getFromCache(tvShowId)
-            if (tvInCache != null) {
-                emit(Resource.Success(tvInCache.tvEntity.toTvShow("")))
-                return@flow
+        // get tvShow from database
+        val tvInDb = movieDatabase.tvDao.getTvById(tvShowId)
+        if (tvInDb != null) {
+
+            // cache form database if tvShow is in my list
+            if (tvInDb.inMyList) {
+                cacheManager.addToCache(tvShowId, localCache(tvInDb))
+                return Resource.Success(tvInDb.toTvShow(""))
             }
 
-            // get tvShow from database
-            val tvInDb = movieDatabase.tvDao.getTvById(tvShowId)
-            if (tvInDb != null) {
-
-                // cache form database if tvShow is in my list
-                if (tvInDb.inMyList) {
-                    emit(Resource.Success(tvInDb.toTvShow("")))
-                    cacheManager.addToCache(tvShowId, localCache(tvInDb))
-                    return@flow
-                }
-
-                // cache from remote if tvShow is not in my list
-                val tvShowDetailDto = try {
-                    tvApi.getATvShow(tvShowId)
-                } catch (ex: IOException) {
-                    ex.printStackTrace()
-                    emit(Resource.Error(message = "Error loading shows"))
-                    return@flow
-                }
-                catch (ex: HttpException) {
-                    ex.printStackTrace()
-                    emit(Resource.Error(message = "Error loading shows"))
-                    Log.d("TestViewModel-TestViewModel", "tvRepo: returning b")
-                    return@flow
-                }
-                catch (ex: Exception) {
-                    ex.printStackTrace()
-                    emit(Resource.Error(message = "Error loading shows"))
-                    return@flow
-                }
-
-                emit(Resource.Success(
-                    tvInDb.toTvShow("").copy(season_count = tvShowDetailDto.seasons?.size ?: 1)
-                ))
-                cacheManager.addToCache(tvShowId, remoteCache(tvShowDetailDto))
-                return@flow
-            }
-
-
-            // get tvShow from remote
+            // cache from remote if tvShow is not in my list
             val tvShowDetailDto = try {
                 tvApi.getATvShow(tvShowId)
             } catch (ex: IOException) {
                 ex.printStackTrace()
-                emit(Resource.Error(message = "Error loading shows"))
-                return@flow
+                return Resource.Error(message = "Error loading shows")
             }
             catch (ex: HttpException) {
                 ex.printStackTrace()
-                emit(Resource.Error(message = "Error loading shows"))
-                return@flow
+                return Resource.Error(message = "Error loading shows")
             }
             catch (ex: Exception) {
                 ex.printStackTrace()
-                emit(Resource.Error(message = "Error loading shows"))
-                return@flow
+                return Resource.Error(message = "Error loading shows")
             }
 
-            // emit and cache the tvShow
-            emit(Resource.Success(tvShowDetailDto.toTvEntity().toTvShow("")))
             cacheManager.addToCache(tvShowId, remoteCache(tvShowDetailDto))
-
-            // stop loading
-            emit(Resource.Loading(isLoading = false))
+            return  Resource.Success(
+                tvInDb.toTvShow("").copy(season_count = tvShowDetailDto.seasons?.size ?: 1)
+            )
         }
+
+        // get tvShow from remote
+        val tvShowDetailDto = try {
+            tvApi.getATvShow(tvShowId)
+        } catch (ex: IOException) {
+            ex.printStackTrace()
+            return Resource.Error(message = "Error loading shows")
+        }
+        catch (ex: HttpException) {
+            ex.printStackTrace()
+            return Resource.Error(message = "Error loading shows")
+        }
+        catch (ex: Exception) {
+            ex.printStackTrace()
+            return Resource.Error(message = "Error loading shows")
+        }
+
+        // emit and cache the tvShow
+        cacheManager.addToCache(tvShowId, remoteCache(tvShowDetailDto))
+        return Resource.Success(tvShowDetailDto.toTvEntity().toTvShow(""))
     }
 
-    override suspend fun getTvEpisodesBySeason(
-        tvShowId: Int,
-        seasonNumber: Int
-    ): Flow<Resource<List<Episode>>> {
-        return flow {
-            emit(Resource.Loading(isLoading = true))
-
-            val getFromCache = cacheManager.getFromCache(tvShowId)
-            if (getFromCache != null) {
-                val seasonOrNull = getFromCache.seasons.find { it.seasonNumber == seasonNumber }
-                seasonOrNull?.let { season ->
-                    emit(Resource.Success(season.episodes.map { it.toEpisode() }))
-                }
-                emit(Resource.Loading(isLoading = false))
-                return@flow
+    override suspend fun getTvEpisodesBySeason(tvShowId: Int, seasonNumber: Int): Resource<List<Episode>>{
+        val getFromCache = cacheManager.getFromCache(tvShowId)
+        if (getFromCache != null) {
+            val seasonOrNull = getFromCache.seasons.find { it.seasonNumber == seasonNumber }
+            seasonOrNull?.let { season ->
+                return Resource.Success(season.episodes.map { it.toEpisode() })
             }
-
-            emit(Resource.Error(message = "Season not available. Try again!"))
-            emit(Resource.Loading(isLoading = false))
         }
+        return Resource.Error(message = "Error loading shows")
     }
 
     override suspend fun getAnEpisode(tvShowId: Int, seasonNumber: Int, episodeId: Int): Flow<Resource<Episode>> {
@@ -211,7 +174,7 @@ class TvShowRepositoryImp @Inject constructor(
         }
     }
 
-    override suspend fun addShowToMyList(tvShowId: Int) {
+    override suspend fun addShowToMyList(tvShowId: Int): Boolean{
         CoroutineScope(Dispatchers.Default).launch {
             val showFromCache = cacheManager.getFromCache(tvShowId)
             if (showFromCache != null) {
@@ -219,18 +182,26 @@ class TvShowRepositoryImp @Inject constructor(
                     movieDatabase.episodeDao.upsertEpisodeList(season.episodes)
                 }
 
-                movieDatabase.tvDao.upsertTv(showFromCache.tvEntity.copy(
-                    inMyList = true, season_count = showFromCache.numberOfSeason))
+                val updatedTvShow = showFromCache.tvEntity.copy(
+                    inMyList = true, season_count = showFromCache.numberOfSeason)
+
+                cacheManager.addToCache(tvShowId, localCache(updatedTvShow))
+                movieDatabase.tvDao.insertTv(updatedTvShow)
             }
-        }
+        }.join()
+        return true
     }
 
-    override suspend fun removeShowFromMyList(tvShowId: Int) {
+    override suspend fun removeShowFromMyList(tvShowId: Int): Boolean{
         CoroutineScope(Dispatchers.Default).launch {
             val tvShow = movieDatabase.tvDao.getTvById(tvShowId)
-            tvShow?.let{ movieDatabase.tvDao.upsertTv(it.copy(inMyList = false)) }
+            tvShow?.let{
+                cacheManager.addToCache(tvShowId, localCache(it.copy(inMyList = false)))
+                movieDatabase.tvDao.insertTv(it.copy(inMyList = false))
+            }
             movieDatabase.episodeDao.removeEpisodes(tvShowId)
-        }
+        }.join()
+        return false
     }
 
     override suspend fun getShowsInMyList(): Flow<Resource<List<TvShow>>> {
@@ -276,7 +247,9 @@ class TvShowRepositoryImp @Inject constructor(
 
         // All coroutines have completed, continue with the rest of your code
         return TvShowModel(id = tvShowDetailDto.id ?: 0,
-            tvEntity = getFromDbJob.await() ?: tvShowDetailDto.toTvEntity(),
+            tvEntity = tvShowDetailDto.toTvEntity().copy(
+                season_count = tvShowDetailDto.number_of_seasons ?: 0, inMyList = getFromDbJob.await()?.inMyList ?: false
+            ),
             numberOfSeason = tvShowDetailDto.number_of_seasons ?: 0, seasons = seasons)
     }
 

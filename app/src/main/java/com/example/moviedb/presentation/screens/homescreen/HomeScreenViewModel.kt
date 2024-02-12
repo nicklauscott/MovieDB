@@ -144,7 +144,8 @@ class HomeScreenViewModel @Inject constructor(
                                 result?.let { movieList ->
                                     _homeScreenState.update {
                                         it.copy(
-                                            movieList = homeScreenState.value.movieList + movieList.shuffled(),
+                                            movieList = if (event.category == Category.MyList) movieList
+                                                    else homeScreenState.value.movieList + movieList.shuffled(),
                                             movieListPage = homeScreenState.value.movieListPage + 1,
                                         )
                                     }
@@ -159,7 +160,8 @@ class HomeScreenViewModel @Inject constructor(
                                 true, event.category, 1) { result ->
                                 result?.let { tvList ->
                                     _homeScreenState.update {
-                                        it.copy(tvShowList = homeScreenState.value.tvShowList + tvList.shuffled(),
+                                        it.copy(tvShowList = if (event.category == Category.MyList) tvList
+                                            else homeScreenState.value.tvShowList + tvList.shuffled(),
                                             tvListPage = 1)
                                     }
                                 }

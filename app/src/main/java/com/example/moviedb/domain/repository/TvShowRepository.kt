@@ -12,16 +12,14 @@ interface TvShowRepository {
         category: String,
         page: Int
     ): Flow<Resource<List<TvShow>>>
-
-    suspend fun getAShow(tvShowId: Int): Flow<Resource<TvShow>>
-
-    suspend fun getTvEpisodesBySeason(tvShowId: Int, seasonNumber: Int): Flow<Resource<List<Episode>>>
+    suspend fun getAShow(tvShowId: Int): Resource<TvShow> // test
+    suspend fun getTvEpisodesBySeason(tvShowId: Int, seasonNumber: Int): Resource<List<Episode>> // test
 
     suspend fun getAnEpisode(tvShowId: Int, seasonNumber: Int, episodeId: Int): Flow<Resource<Episode>>
 
-    suspend fun addShowToMyList(tvShowId: Int)
+    suspend fun addShowToMyList(tvShowId: Int): Boolean
 
-    suspend fun removeShowFromMyList(tvShowId: Int)
+    suspend fun removeShowFromMyList(tvShowId: Int): Boolean
 
     suspend fun getShowsInMyList(): Flow<Resource<List<TvShow>>>
 }
