@@ -78,7 +78,7 @@ fun SeasonSpinner(
         // subjects
         seasons.forEach { season ->
             DropdownMenuItem(text = { Text(text = "Season $season",
-                style = MaterialTheme.typography.headlineSmall,
+                style = MaterialTheme.typography.bodyMedium,
                 fontFamily = FontFamily.Monospace) },
                 onClick = {
                     expanded.value = false

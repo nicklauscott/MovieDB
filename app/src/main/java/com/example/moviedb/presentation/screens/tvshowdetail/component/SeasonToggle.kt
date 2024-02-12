@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -27,7 +28,7 @@ fun SeasonToggle(tvShow: TvShow, episodes: List<Episode>, currentSeason: Int, on
         horizontalArrangement = Arrangement.Start
     ) {
         Surface(
-            color = Color.LightGray.copy(alpha = 0.2f),
+            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.25f),
             shape = RoundedCornerShape(4.dp)
         ) {
             SeasonSpinner(seasons = (1..tvShow.season_count).toList(),
@@ -47,7 +48,7 @@ fun SeasonToggle(tvShow: TvShow, episodes: List<Episode>, currentSeason: Int, on
                     text = episodes.size.toString() +
                             if (episodes.size == 1) " episode" else " episodes"
                                     + " " + episodes[0].air_date.split("-")[0],
-                    color = Color.LightGray.copy(alpha = 0.7f),
+                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
                     fontSize = 15.sp,
                     fontFamily = FontFamily.Monospace
                 )

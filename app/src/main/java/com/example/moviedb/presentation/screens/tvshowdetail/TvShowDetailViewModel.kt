@@ -5,10 +5,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.moviedb.domain.usecase.TvDetailScreenUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
@@ -23,9 +26,21 @@ class TvShowDetailViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             val tvShowId = savedStateHandle.get<Int>("show_id")
-            tvDetailScreenUseCase.getTvShowDetail(tvShowId ?: -1) { tvShow, episodes ->
-                _tvShowDetailScreenState.update {
-                    it.copy(tvShow = tvShow, episodes = episodes ?: emptyList())
+            launch(Dispatchers.IO) {
+                tvDetailScreenUseCase.getTvShowDetail(tvShowId ?: -1) { tvShow ->
+                    _tvShowDetailScreenState.update {
+                        it.copy(tvShow = tvShow)
+                    }
+                }
+            }.join()
+
+
+            CoroutineScope(Dispatchers.Default).launch {
+                val newEpisodes = tvDetailScreenUseCase.getEpisodeLIst(tvShowId ?: -1, 1)
+                withContext(Dispatchers.Main) {
+                    _tvShowDetailScreenState.update {
+                        it.copy(episodes = newEpisodes ?: emptyList(), isEpisodeLoading = false)
+                    }
                 }
             }
         }

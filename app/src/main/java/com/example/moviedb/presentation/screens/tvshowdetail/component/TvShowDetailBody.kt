@@ -35,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.moviedb.domain.model.TvShow
 import com.example.moviedb.presentation.component.MatureRating
+import com.example.moviedb.util.countryCodesToNames
 
 @Composable
 fun TvShowDetailBody(tvShow: TvShow, isEpisodeVisible: Boolean,
@@ -56,7 +57,7 @@ fun TvShowDetailBody(tvShow: TvShow, isEpisodeVisible: Boolean,
             Text(
                 modifier = Modifier.padding(start = 4.dp),
                 text = year,
-                color = Color.LightGray.copy(alpha = 0.7f),
+                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
                 fontSize = 14.sp,
                 maxLines = 1,
                 fontFamily = FontFamily.Monospace
@@ -71,7 +72,7 @@ fun TvShowDetailBody(tvShow: TvShow, isEpisodeVisible: Boolean,
             Text(
                 modifier = Modifier.padding(start = 4.dp),
                 text = tvShow.season_count.toString() + if (tvShow.season_count == 1) " Season" else " Seasons",
-                color = Color.LightGray.copy(alpha = 0.7f),
+                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
                 fontSize = 14.sp,
                 maxLines = 1,
                 fontFamily = FontFamily.Monospace
@@ -91,10 +92,60 @@ fun TvShowDetailBody(tvShow: TvShow, isEpisodeVisible: Boolean,
                 tvShow.overview.take(145) + if (tvShow.overview.length >= 150) "..." else ""
             }
             else tvShow.overview,
-            color = Color.LightGray,
+            color = MaterialTheme.colorScheme.onBackground,
             fontSize = 14.sp,
             fontFamily = FontFamily.Serif
         )
+
+        Spacer(modifier = Modifier.height(10.dp))
+
+        if (tvShow.name != tvShow.original_name) {
+            Row(horizontalArrangement = Arrangement.Start) {
+                Text(
+                    modifier = Modifier.padding(start = 4.dp),
+                    text = "Original Name:",
+                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
+                    fontSize = 14.sp,
+                    maxLines = 1,
+                    fontFamily = FontFamily.Monospace
+                )
+                Spacer(modifier = Modifier.width(3.dp))
+                Text(
+                    modifier = Modifier.padding(start = 4.dp),
+                    text = tvShow.original_name,
+                    color = MaterialTheme.colorScheme.onBackground,
+                    fontSize = 16.sp,
+                    maxLines = 1,
+                    fontFamily = FontFamily.Serif
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(5.dp))
+
+        Row(horizontalArrangement = Arrangement.Start) {
+            Text(
+                modifier = Modifier.padding(start = 4.dp),
+                text = "Original Country:",
+                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
+                fontSize = 14.sp,
+                maxLines = 1,
+                fontFamily = FontFamily.Monospace
+            )
+            Spacer(modifier = Modifier.width(3.dp))
+            val countries = tvShow.origin_country.map {
+                countryCodesToNames[it]
+            }
+
+            Text(
+                modifier = Modifier.padding(start = 4.dp),
+                text = countries.joinToString(", "),
+                color = MaterialTheme.colorScheme.onBackground,
+                fontSize = 16.sp,
+                maxLines = 1,
+                fontFamily = FontFamily.Serif
+            )
+        }
 
         Spacer(modifier = Modifier.height(10.dp))
 
@@ -128,7 +179,7 @@ fun TvShowDetailBody(tvShow: TvShow, isEpisodeVisible: Boolean,
                     modifier = Modifier
                         .padding(start = 4.dp),
                     text = "My List",
-                    color = Color.LightGray.copy(alpha = 0.7f),
+                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
                     fontSize = 13.sp,
                     fontFamily = FontFamily.Monospace
                 )
@@ -149,18 +200,23 @@ fun TvShowDetailBody(tvShow: TvShow, isEpisodeVisible: Boolean,
                 modifier = Modifier
                     .wrapContentWidth()
                     .clickable(enabled = !isEpisodeVisible) {
-                    onClickEpisodeOrRelated(1)
-                }
+                        onClickEpisodeOrRelated(1)
+                    }
             ) {
-                Divider(modifier = Modifier.height(3.dp).width(70.dp)
-                    .clip(RoundedCornerShape(
-                        topStart = 0.dp, topEnd = 0.dp, bottomStart = 4.dp, bottomEnd = 4.dp
-                    )),
+                Divider(modifier = Modifier
+                    .height(3.dp)
+                    .width(70.dp)
+                    .clip(
+                        RoundedCornerShape(
+                            topStart = 0.dp, topEnd = 0.dp, bottomStart = 4.dp, bottomEnd = 4.dp
+                        )
+                    ),
                     color = if (isEpisodeVisible) MaterialTheme.colorScheme.primary else Color.Transparent
                     )
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
-                    modifier = Modifier.wrapContentWidth()
+                    modifier = Modifier
+                        .wrapContentWidth()
                         .padding(start = 4.dp),
                     text = "Episodes",
                     color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.8f),
@@ -178,10 +234,14 @@ fun TvShowDetailBody(tvShow: TvShow, isEpisodeVisible: Boolean,
                     onClickEpisodeOrRelated(2)
                 }
             ) {
-                Divider(modifier = Modifier.height(3.dp).width(110.dp)
-                    .clip(RoundedCornerShape(
-                        topStart = 0.dp, topEnd = 0.dp, bottomStart = 4.dp, bottomEnd = 4.dp
-                    )),
+                Divider(modifier = Modifier
+                    .height(3.dp)
+                    .width(110.dp)
+                    .clip(
+                        RoundedCornerShape(
+                            topStart = 0.dp, topEnd = 0.dp, bottomStart = 4.dp, bottomEnd = 4.dp
+                        )
+                    ),
                     color = if (!isEpisodeVisible) MaterialTheme.colorScheme.primary else Color.Transparent
                 )
                 Spacer(modifier = Modifier.height(16.dp))
@@ -199,3 +259,5 @@ fun TvShowDetailBody(tvShow: TvShow, isEpisodeVisible: Boolean,
         }
     }
 }
+
+

@@ -12,7 +12,17 @@ class GetTvShowDetail @Inject constructor(
     private val tvShowRepository: TvShowRepository
 ) {
 
-    suspend operator fun invoke(tvShowId: Int, result: (TvShow?, List<Episode>?) -> Unit) {
+    suspend operator fun invoke(tvShowId: Int, result: (TvShow?) -> Unit) {
+        when (val tvShow = tvShowRepository.getAShow(tvShowId)) {
+            is Resource.Error -> {}
+            is Resource.Loading -> {}
+            is Resource.Success -> {
+                result(tvShow.data)
+            }
+        }
+    }
+
+    suspend fun test(tvShowId: Int, result: (TvShow?, List<Episode>?) -> Unit) {
         when (val tvShow = tvShowRepository.getAShow(tvShowId)) {
             is Resource.Error -> {}
             is Resource.Loading -> {}
