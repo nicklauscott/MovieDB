@@ -1,5 +1,6 @@
 package com.example.moviedb.data.cache
 
+import android.util.Log
 import android.util.LruCache
 
 class CacheManger {
@@ -7,7 +8,7 @@ class CacheManger {
 
     init {
         val maxMemory = (Runtime.getRuntime().maxMemory() / 1024).toInt()
-        val cacheSize = maxMemory / 8
+        val cacheSize = maxMemory / 2
         tvShowCache = LruCache(cacheSize)
     }
 
@@ -22,7 +23,7 @@ class CacheManger {
         tvShowCache.put(key, value)
     }
 
-    fun getFromCache(key: Int): TvShowModel? {
+    suspend fun getFromCache(key: Int): TvShowModel? {
         return tvShowCache.get(key)
     }
 }

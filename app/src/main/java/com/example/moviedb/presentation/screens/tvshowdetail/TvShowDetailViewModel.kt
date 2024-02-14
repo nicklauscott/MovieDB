@@ -1,12 +1,15 @@
 package com.example.moviedb.presentation.screens.tvshowdetail
 
+import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.moviedb.domain.usecase.TvDetailScreenUseCase
+import com.example.moviedb.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -29,19 +32,14 @@ class TvShowDetailViewModel @Inject constructor(
             launch(Dispatchers.IO) {
                 tvDetailScreenUseCase.getTvShowDetail(tvShowId ?: -1) { tvShow ->
                     _tvShowDetailScreenState.update {
-                        it.copy(tvShow = tvShow)
+                        it.copy(tvShow = tvShow, isEpisodeLoading = false)
                     }
                 }
             }.join()
 
-
-            CoroutineScope(Dispatchers.Default).launch {
-                val newEpisodes = tvDetailScreenUseCase.getEpisodeLIst(tvShowId ?: -1, 1)
-                withContext(Dispatchers.Main) {
-                    _tvShowDetailScreenState.update {
-                        it.copy(episodes = newEpisodes ?: emptyList(), isEpisodeLoading = false)
-                    }
-                }
+            val newEpisodes = tvDetailScreenUseCase.getEpisodeLIst(tvShowId ?: -1, 1)
+            _tvShowDetailScreenState.update {
+                it.copy(episodes = newEpisodes ?: emptyList(), isEpisodeLoading = false)
             }
         }
     }

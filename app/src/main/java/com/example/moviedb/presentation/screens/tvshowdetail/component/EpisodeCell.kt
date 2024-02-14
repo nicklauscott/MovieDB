@@ -4,6 +4,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -25,8 +26,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontFamily
@@ -53,7 +57,7 @@ fun EpisodeCell(episode: Episode, onClick: (Episode) -> Unit) {
             .fillMaxWidth()
             .padding(start = 16.dp, end = 16.dp, top = 4.dp, bottom = 4.dp)
             .clip(RoundedCornerShape(4.dp))
-            .background(color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.1f))
+            .background(color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.05f))
             .clickable { onClick(episode) }
     ) {
 
@@ -72,24 +76,51 @@ fun EpisodeCell(episode: Episode, onClick: (Episode) -> Unit) {
                 elevation = CardDefaults.cardElevation(
                     defaultElevation = 6.dp
                 ),
-                shape = RoundedCornerShape(4.dp)
+                shape = RoundedCornerShape(topStart = 4.dp, topEnd = 0.dp, bottomStart = 0.dp, bottomEnd = 4.dp)
             ) {
-                if (posterImageState is AsyncImagePainter.State.Error) {
-                    Icon(
-                        modifier = Modifier.size(70.dp),
-                        imageVector = Icons.Rounded.ImageNotSupported,
-                        contentDescription = episode.name
-                    )
-                }
+                Box {
+                    if (posterImageState is AsyncImagePainter.State.Error) {
+                        Icon(
+                            modifier = Modifier.size(70.dp),
+                            imageVector = Icons.Rounded.ImageNotSupported,
+                            contentDescription = episode.name
+                        )
+                    }
 
-                if (posterImageState is AsyncImagePainter.State.Success) {
-                    Image(
+                    if (posterImageState is AsyncImagePainter.State.Success) {
+                        Image(
+                            modifier = Modifier
+                                .fillMaxSize(),
+                            painter = posterImageState.painter,
+                            contentDescription = episode.name,
+                            contentScale = ContentScale.Crop
+                        )
+                    }
+
+                    // gradient
+                    Box(
                         modifier = Modifier
-                            .fillMaxSize(),
-                        painter = posterImageState.painter,
-                        contentDescription = episode.name,
-                        contentScale = ContentScale.Crop
+                            .fillMaxSize()
+                            .background(
+                                brush = Brush.verticalGradient(
+                                    colors = listOf(Color.Transparent, Color.Black),
+                                    startY = 75f
+                                )
+                            )
                     )
+
+                    // runtime
+                    Box(modifier = Modifier.fillMaxSize().padding(5.dp),
+                        contentAlignment = Alignment.BottomEnd
+                    ) {
+                        Text(
+                            text = episode.runtime.toString() + " Min",
+                            color = Color.White.copy(alpha = 0.8f),
+                            fontSize = 13.sp,
+                            maxLines = 1,
+                            fontFamily = FontFamily.Serif
+                        )
+                    }
                 }
             }
 
@@ -152,7 +183,9 @@ fun EpisodeCell(episode: Episode, onClick: (Episode) -> Unit) {
         )
 
         Spacer(modifier = Modifier.height(5.dp))
-        Divider(modifier = Modifier.height(0.5.dp).fillMaxWidth(),
-            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.2f))
+        Divider(modifier = Modifier
+            .height(0.5.dp)
+            .fillMaxWidth(),
+            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.1f))
     }
 }

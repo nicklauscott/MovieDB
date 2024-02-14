@@ -13,6 +13,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -36,6 +37,7 @@ fun TvShowDetailScreen(
 
     val state = viewModel.tvShowDetailScreenState.collectAsState()
     val scrollState = rememberScrollState()
+
 
     val isEpisodeVisible = remember {
         mutableStateOf(true)
@@ -89,7 +91,9 @@ fun TvShowDetailScreen(
                         }
 
                         if (state.value.episodes.isEmpty()) {
-                            Column(modifier = Modifier.fillMaxWidth().height(100.dp),
+                            Column(modifier = Modifier
+                                .fillMaxWidth()
+                                .height(100.dp),
                                 verticalArrangement = Arrangement.Top,
                                 horizontalAlignment = Alignment.CenterHorizontally) {
                                 CircularProgressIndicator()

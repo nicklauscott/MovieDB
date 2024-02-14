@@ -7,6 +7,8 @@ import com.example.moviedb.util.Resource
 import kotlinx.coroutines.flow.Flow
 
 interface TvShowRepository {
+
+    suspend fun test(tvShowId: Int): Flow<Resource<TvShow>>
     suspend fun getTvShows(
         forceFetchFromRemote: Boolean,
         category: String,

@@ -6,6 +6,7 @@ import com.example.moviedb.domain.model.TvShow
 import com.example.moviedb.domain.repository.TvShowRepository
 import com.example.moviedb.util.Resource
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class GetTvShowDetail @Inject constructor(
@@ -20,6 +21,10 @@ class GetTvShowDetail @Inject constructor(
                 result(tvShow.data)
             }
         }
+    }
+
+    suspend fun test(tvShowId: Int): Flow<Resource<TvShow>> {
+        return tvShowRepository.test(tvShowId)
     }
 
     suspend fun test(tvShowId: Int, result: (TvShow?, List<Episode>?) -> Unit) {
