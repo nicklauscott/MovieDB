@@ -7,5 +7,9 @@ data class TvShowDetailScreenState(
     val tvShow: TvShow? = null,
 
     val isEpisodeLoading: Boolean = false,
-    val episodes: List<Episode> = emptyList()
+    val episodeError: String? = null,
+    val episodes: List<Episode> = emptyList(),
+
+    val isSimilarTvShowsLoading: Boolean = false,
+    val similarTvShows: List<TvShow> = emptyList()
 )

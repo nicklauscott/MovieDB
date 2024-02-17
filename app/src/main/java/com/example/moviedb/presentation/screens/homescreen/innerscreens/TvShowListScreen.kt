@@ -76,49 +76,4 @@ fun TvShowListScreen(
             }
         }
     }
-
-
-
-
-
-    //    when {
-//        homeScreenState.isLoading -> {
-//            Box(
-//                modifier = Modifier.fillMaxSize(),
-//                contentAlignment = Alignment.Center
-//            ) {
-//                CircularProgressIndicator()
-//            }
-//        }
-//        else -> {
-//            val data = homeScreenState.tvShowList
-//            if (data.isEmpty()) {
-//                Box(
-//                    modifier = Modifier.fillMaxSize(),
-//                    contentAlignment = Alignment.Center
-//                ) {
-//                    Text(text = "No Tv Shows available", fontSize = 18.sp,
-//                        style = MaterialTheme.typography.headlineMedium)
-//                }
-//            }else {
-//                LazyVerticalGrid(
-//                    columns = GridCells.Fixed(2),
-//                    modifier = Modifier.fillMaxSize(),
-//                    contentPadding = PaddingValues(vertical = 8.dp, horizontal = 4.dp)
-//                ) {
-//                    items(homeScreenState.tvShowList.size) { index ->
-//                        TvShowItem(
-//                            tvShow = homeScreenState.tvShowList[index],
-//                            navController = navController
-//                        )
-//                        Spacer(modifier = Modifier.height(16.dp))
-//
-//                        if (index >= homeScreenState.tvShowList.size - 1) {
-//                            onEvent(HomeScreenUiEvent.Paginate(homeScreenState.category))
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//    }
 }

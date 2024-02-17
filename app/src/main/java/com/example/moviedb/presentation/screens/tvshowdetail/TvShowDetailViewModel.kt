@@ -1,20 +1,16 @@
 package com.example.moviedb.presentation.screens.tvshowdetail
 
-import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.moviedb.domain.usecase.TvDetailScreenUseCase
 import com.example.moviedb.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
@@ -37,9 +33,24 @@ class TvShowDetailViewModel @Inject constructor(
                 }
             }.join()
 
-            val newEpisodes = tvDetailScreenUseCase.getEpisodeLIst(tvShowId ?: -1, 1)
-            _tvShowDetailScreenState.update {
-                it.copy(episodes = newEpisodes ?: emptyList(), isEpisodeLoading = false)
+            tvDetailScreenUseCase.getEpisodeLIst.test(tvShowId ?: -1, 1).collect {
+                when (it) {
+                    is Resource.Error -> {
+                        _tvShowDetailScreenState.update { state ->
+                            state.copy(episodeError = it.message)
+                        }
+                    }
+                    is Resource.Loading -> {
+                        _tvShowDetailScreenState.update { state ->
+                            state.copy(isEpisodeLoading = state.isEpisodeLoading)
+                        }
+                    }
+                    is Resource.Success -> {
+                        _tvShowDetailScreenState.update { state ->
+                            state.copy(episodes = it.data ?: emptyList())
+                        }
+                    }
+                }
             }
         }
     }
@@ -77,14 +88,51 @@ class TvShowDetailViewModel @Inject constructor(
                 }
                 viewModelScope.launch {
                     _tvShowDetailScreenState.value.tvShow?.let { tvShow ->
-                        val newEpisodes = tvDetailScreenUseCase.getEpisodeLIst(tvShow.id, event.season)
-                        _tvShowDetailScreenState.update {
-                            it.copy(episodes = newEpisodes ?: emptyList(), isEpisodeLoading = false)
+
+                        tvDetailScreenUseCase.getEpisodeLIst.test(tvShow.id, event.season).collect {
+                            when (it) {
+                                is Resource.Error -> {
+                                    _tvShowDetailScreenState.update { state ->
+                                        state.copy(episodeError = it.message)
+                                    }
+                                }
+                                is Resource.Loading -> {
+                                    _tvShowDetailScreenState.update { state ->
+                                        state.copy(isEpisodeLoading = state.isEpisodeLoading)
+                                    }
+                                }
+                                is Resource.Success -> {
+                                    _tvShowDetailScreenState.update { state ->
+                                        state.copy(episodes = it.data ?: emptyList())
+                                    }
+                                }
+                            }
                         }
                     }
                 }
             }
-            TvShowDetailScreenUiEvent.RelatedShows -> TODO()
+            TvShowDetailScreenUiEvent.SimilarShows -> {
+                viewModelScope.launch {
+                    if (tvShowDetailScreenState.value.similarTvShows.isEmpty()) {
+                        tvDetailScreenUseCase.getSimilarTvShowLIst(tvShowDetailScreenState.value.tvShow?.id ?: -1)
+                            .collect {
+                                when (it) {
+                                    is Resource.Error -> {}
+                                    is Resource.Loading -> {
+                                        _tvShowDetailScreenState.update { state ->
+                                            state.copy(isSimilarTvShowsLoading = it.isLoading)
+                                        }
+                                    }
+                                    is Resource.Success -> {
+                                        _tvShowDetailScreenState.update { state ->
+                                            state.copy(similarTvShows = it.data ?: emptyList())
+                                        }
+                                    }
+                                }
+                            }
+                    }
+                }
+            }
         }
     }
 }

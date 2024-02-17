@@ -96,4 +96,31 @@ class MovieRepositoryImpl @Inject constructor(
             }
         }
     }
+
+    override suspend fun getSimilarMovies(movieId: Int): Flow<Resource<List<Movie>>> {
+        return flow {
+            emit(Resource.Loading(isLoading = true))
+
+            val similarMovieListDto = try {
+                movieApi.getSimilarMovies(movieId, 1)
+            } catch (ex: IOException) {
+                ex.printStackTrace()
+                emit(Resource.Error(message = "Error loading movies"))
+                return@flow
+            }
+            catch (ex: HttpException) {
+                ex.printStackTrace()
+                emit(Resource.Error(message = "Error loading movies"))
+                return@flow
+            }
+            catch (ex: Exception) {
+                ex.printStackTrace()
+                emit(Resource.Error(message = "Error loading movies"))
+                return@flow
+            }
+
+            emit(Resource.Success(similarMovieListDto.results.map { it.toMovie() }))
+            emit(Resource.Loading(isLoading = false))
+        }
+    }
 }

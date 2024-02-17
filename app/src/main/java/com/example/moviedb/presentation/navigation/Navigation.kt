@@ -7,6 +7,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.moviedb.presentation.screens.homescreen.HomeScreen
+import com.example.moviedb.presentation.screens.search.SearchScreen
 import com.example.moviedb.presentation.screens.splash.SplashScreen
 import com.example.moviedb.presentation.screens.tvshowdetail.TvShowDetailScreen
 
@@ -33,6 +34,10 @@ fun Navigation() {
             )
         ) {
             TvShowDetailScreen(navController)
+        }
+
+        composable(Screens.Search.route) {
+            SearchScreen(navController = navController)
         }
     }
 }

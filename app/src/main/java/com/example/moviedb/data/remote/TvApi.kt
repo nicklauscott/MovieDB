@@ -1,5 +1,6 @@
 package com.example.moviedb.data.remote
 
+import com.example.moviedb.data.remote.respond.similar.tvshow.SimilarTvShowListDto
 import com.example.moviedb.data.remote.respond.tv.TvListDto
 import com.example.moviedb.data.remote.respond.tv.episode.EpisodeListDto
 import com.example.moviedb.data.remote.respond.tv.tvdetail.TvShowDetailDto
@@ -29,4 +30,14 @@ interface TvApi {
         @Path("season_number") seasonNumber: Int,
         @Query("api_key") apiKey: String = MovieApi.API_KEY
     ): EpisodeListDto
+
+
+    // tv/46707/similar?language=en-US&page=1&api_key=231d83b09f2a9487b1139ae666f54e97
+    @GET("tv/{series_id}/similar")
+    suspend fun getSimilarTvShows(
+        @Path("series_id") seriesId: Int,
+        @Query("page") page: Int,
+        @Query("api_key") apiKey: String = MovieApi.API_KEY
+    ): SimilarTvShowListDto
+
 }

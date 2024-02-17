@@ -23,7 +23,7 @@ interface MovieDao {
     @Upsert
     suspend fun upsertMovie(movieEntity: MovieEntity)
 
-    @Query("SELECT * FROM movie WHERE title LIKE :searchQuery")
+    @Query("SELECT * FROM movie WHERE title LIKE '%' || :searchQuery || '%'")
     fun searchMovieByName(searchQuery: String): List<MovieEntity>
 
 }

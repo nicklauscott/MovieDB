@@ -6,15 +6,20 @@ import com.example.moviedb.data.local.MovieDatabase
 import com.example.moviedb.data.remote.MovieApi
 import com.example.moviedb.data.remote.TvApi
 import com.example.moviedb.data.cache.CacheManger
+import com.example.moviedb.data.remote.SearchApi
+import com.example.moviedb.data.repository.SearchRepositoryImpl
 import com.example.moviedb.domain.repository.MovieRepository
+import com.example.moviedb.domain.repository.SearchRepository
 import com.example.moviedb.domain.repository.TvShowRepository
 import com.example.moviedb.domain.usecase.AddToMyList
 import com.example.moviedb.domain.usecase.GetEpisodeLIst
 import com.example.moviedb.domain.usecase.GetMovieList
+import com.example.moviedb.domain.usecase.GetSimilarTvShowLIst
 import com.example.moviedb.domain.usecase.GetTvShowDetail
 import com.example.moviedb.domain.usecase.GetTvShowList
 import com.example.moviedb.domain.usecase.HomeScreenUseCase
 import com.example.moviedb.domain.usecase.RemoveFromMyList
+import com.example.moviedb.domain.usecase.SearchListUsecase
 import com.example.moviedb.domain.usecase.TvDetailScreenUseCase
 import dagger.Module
 import dagger.Provides
@@ -50,6 +55,7 @@ object AppModule {
             .create(MovieApi::class.java)
     }
 
+    @Singleton
     @Provides
     fun provideTvApi(): TvApi{
         return Retrofit.Builder()
@@ -58,6 +64,17 @@ object AppModule {
             .client(client)
             .build()
             .create(TvApi::class.java)
+    }
+
+    @Singleton
+    @Provides
+    fun provideSearchApi(): SearchApi{
+        return Retrofit.Builder()
+            .addConverterFactory(GsonConverterFactory.create())
+            .baseUrl(MovieApi.BASE_URL)
+            .client(client)
+            .build()
+            .create(SearchApi::class.java)
     }
 
     @Singleton
@@ -115,11 +132,26 @@ object AppModule {
         return GetEpisodeLIst(tvShowRepository)
     }
 
+
+    // SimilarTvShowLIst
+    @Singleton
+    @Provides
+    fun provideGetSimilarTvShowLIst(tvShowRepository: TvShowRepository): GetSimilarTvShowLIst {
+        return GetSimilarTvShowLIst(tvShowRepository)
+    }
+
+    @Singleton
+    @Provides
+    fun provideSearchListUsecase(searchRepository: SearchRepository): SearchListUsecase{
+        return SearchListUsecase(searchRepository)
+    }
+
     @Singleton
     @Provides
     fun provideHomeScreenUsecase(
         getMovieList: GetMovieList, getTvShowList: GetTvShowList
     ): HomeScreenUseCase = HomeScreenUseCase(getMovieList, getTvShowList)
+
 
     @Singleton
     @Provides
@@ -127,9 +159,10 @@ object AppModule {
         getTvShowDetail: GetTvShowDetail,
         getEpisodeLIst: GetEpisodeLIst,
         addToMyList: AddToMyList,
-        removeFromMyList: RemoveFromMyList
+        removeFromMyList: RemoveFromMyList,
+        getSimilarTvShowLIst: GetSimilarTvShowLIst
     ): TvDetailScreenUseCase =
-        TvDetailScreenUseCase(getTvShowDetail, getEpisodeLIst, addToMyList, removeFromMyList)
+        TvDetailScreenUseCase(getTvShowDetail, getEpisodeLIst, addToMyList, removeFromMyList, getSimilarTvShowLIst)
 
 }
 

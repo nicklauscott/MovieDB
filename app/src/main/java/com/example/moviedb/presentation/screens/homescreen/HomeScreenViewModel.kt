@@ -105,7 +105,7 @@ class HomeScreenViewModel @Inject constructor(
                                     result?.let { movieList ->
                                         _homeScreenState.update {
                                             it.copy(
-                                                movieList = homeScreenState.value.movieList + movieList.shuffled(),
+                                                movieList = homeScreenState.value.movieList + movieList,
                                                 movieListPage = homeScreenState.value.movieListPage + 1,
                                             )
                                         }
@@ -123,7 +123,7 @@ class HomeScreenViewModel @Inject constructor(
                                     homeScreenState.value.tvListPage + 1) { result ->
                                     result?.let { tvList ->
                                         _homeScreenState.update {
-                                            it.copy(tvShowList = homeScreenState.value.tvShowList + tvList.shuffled(),
+                                            it.copy(tvShowList = homeScreenState.value.tvShowList + tvList,
                                                 tvListPage = homeScreenState.value.tvListPage + 1)
                                         }
                                     }
@@ -145,7 +145,7 @@ class HomeScreenViewModel @Inject constructor(
                                     _homeScreenState.update {
                                         it.copy(
                                             movieList = if (event.category == Category.MyList) movieList
-                                                    else homeScreenState.value.movieList + movieList.shuffled(),
+                                                    else homeScreenState.value.movieList + movieList,
                                             movieListPage = homeScreenState.value.movieListPage + 1,
                                         )
                                     }

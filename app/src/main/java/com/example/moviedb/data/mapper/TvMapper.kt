@@ -1,6 +1,7 @@
 package com.example.moviedb.data.mapper
 
 import com.example.moviedb.data.local.tv.TvEntity
+import com.example.moviedb.data.remote.respond.similar.tvshow.SimilarTvShowDto
 import com.example.moviedb.data.remote.respond.tv.TvDto
 import com.example.moviedb.data.remote.respond.tv.tvdetail.TvShowDetailDto
 import com.example.moviedb.domain.model.TvShow
@@ -91,4 +92,26 @@ fun TvShowDetailDto.toTvEntity(): TvEntity =
         vote_count = vote_count ?: 0,
         category = "",
         inMyList = false
+    )
+
+fun SimilarTvShowDto.toTvShow(): TvShow =
+    TvShow(
+        id = id ?: -1,
+        adult = adult ?: false,
+        backdrop_path = backdrop_path ?: "",
+        first_air_date = first_air_date ?: "",
+        genre_ids = genre_ids ?: listOf(),
+        season_count = 1,
+        media_type = "tv",
+        name = name ?: "",
+        origin_country = origin_country ?: listOf(),
+        original_language = original_language ?: "",
+        original_name = original_name ?: "",
+        overview = overview ?: "",
+        popularity = popularity ?: 0.0,
+        poster_path = poster_path ?: "",
+        vote_average = vote_average ?: 0.0,
+        vote_count = vote_count ?: 0,
+        inMyList = null,
+        category = ""
     )

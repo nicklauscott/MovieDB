@@ -2,6 +2,7 @@ package com.example.moviedb.data.mapper
 
 import com.example.moviedb.data.local.movie.MovieEntity
 import com.example.moviedb.data.remote.respond.MovieDto
+import com.example.moviedb.data.remote.respond.similar.movie.SimilarMovieDto
 import com.example.moviedb.domain.model.Movie
 
 fun MovieDto.toMovieEntity(category: String): MovieEntity =
@@ -49,4 +50,24 @@ fun MovieEntity.toMovie(category: String): Movie =
         }catch (ex: Exception) {
             listOf(-1, -2)
         }
+    )
+
+
+fun SimilarMovieDto.toMovie(): Movie =
+    Movie(
+        id = id ?: -1,
+        category = "",
+        adult = adult ?: false,
+        backdrop_path = backdrop_path ?: "",
+        genre_ids = genre_ids ?: listOf(),
+        original_language = original_language ?: "",
+        original_title = original_title ?: "",
+        overview = overview ?: "",
+        popularity = popularity ?: 0.0,
+        poster_path = poster_path ?: "",
+        release_date = release_date ?: "",
+        title = title ?: "",
+        video = video ?: false,
+        vote_average = vote_average ?: 0.0,
+        vote_count = vote_count ?: 0
     )

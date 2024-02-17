@@ -37,7 +37,7 @@ class TvShowRepositoryImp @Inject constructor(
 ): TvShowRepository {
 
 
-    override suspend fun test(tvShowId: Int): Flow<Resource<TvShow>> {
+    suspend fun test1(tvShowId: Int): Flow<Resource<TvShow>> {
        return  flow {
            emit(Resource.Loading(true))
 
@@ -226,6 +226,29 @@ class TvShowRepositoryImp @Inject constructor(
         return Resource.Success(tvShowDetailDto.toTvEntity().toTvShow(""))
     }
 
+     override suspend fun test(tvShowId: Int, seasonNumber: Int): Flow<Resource<List<Episode>>>{
+        return flow {
+            cacheManager.getFlowFromCache(tvShowId).collect {
+                when (it) {
+                    is Resource.Error -> {
+                        emit(Resource.Error(it.message))
+                        return@collect
+                    }
+                    is Resource.Success -> {
+                        it.data?.seasons?.find { seasons -> seasons.seasonNumber == seasonNumber }?.let {  episodes ->
+                            emit(Resource.Success(episodes.episodes.map { episodeEntity ->  episodeEntity.toEpisode() }))
+                        }
+                        emit(Resource.Loading(false))
+                        return@collect
+                    }
+                    else -> {
+
+                    }
+                }
+            }
+        }
+    }
+
     override suspend fun getTvEpisodesBySeason(tvShowId: Int, seasonNumber: Int): Resource<List<Episode>>{
         val getFromCache = cacheManager.getFromCache(tvShowId)
         if (getFromCache != null) {
@@ -362,4 +385,30 @@ class TvShowRepositoryImp @Inject constructor(
             numberOfSeason = tvEntity.season_count, seasons = seasons)
     }
 
+    override suspend fun getSimilarTvShows(tvShowId: Int): Flow<Resource<List<TvShow>>> {
+        return flow {
+            emit(Resource.Loading(isLoading = true))
+
+            val similarTvShowListDto = try {
+                tvApi.getSimilarTvShows(tvShowId, 1)
+            } catch (ex: IOException) {
+                ex.printStackTrace()
+                emit(Resource.Error(message = "Error loading shows"))
+                return@flow
+            }
+            catch (ex: HttpException) {
+                ex.printStackTrace()
+                emit(Resource.Error(message = "Error loading shows"))
+                return@flow
+            }
+            catch (ex: Exception) {
+                ex.printStackTrace()
+                emit(Resource.Error(message = "Error loading shows"))
+                return@flow
+            }
+
+            emit(Resource.Success(similarTvShowListDto.results.map { it.toTvShow() }))
+            emit(Resource.Loading(isLoading = false))
+        }
+    }
 }
