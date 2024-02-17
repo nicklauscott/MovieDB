@@ -385,7 +385,7 @@ class TvShowRepositoryImp @Inject constructor(
             numberOfSeason = tvEntity.season_count, seasons = seasons)
     }
 
-    override suspend fun getSimilarTvShows(tvShowId: Int): Flow<Resource<List<TvShow>>> {
+    override suspend fun getSimilarTvShows(tvShowId: Int, genres: List<Int>): Flow<Resource<List<TvShow>>> {
         return flow {
             emit(Resource.Loading(isLoading = true))
 
@@ -393,22 +393,36 @@ class TvShowRepositoryImp @Inject constructor(
                 tvApi.getSimilarTvShows(tvShowId, 1)
             } catch (ex: IOException) {
                 ex.printStackTrace()
-                emit(Resource.Error(message = "Error loading shows"))
+                emit(Resource.Success(getOffLineSimilarShows(genres)))
+                emit(Resource.Loading(isLoading = false))
                 return@flow
             }
             catch (ex: HttpException) {
                 ex.printStackTrace()
                 emit(Resource.Error(message = "Error loading shows"))
+                emit(Resource.Loading(isLoading = false))
                 return@flow
             }
             catch (ex: Exception) {
                 ex.printStackTrace()
                 emit(Resource.Error(message = "Error loading shows"))
+                emit(Resource.Loading(isLoading = false))
                 return@flow
             }
 
             emit(Resource.Success(similarTvShowListDto.results.map { it.toTvShow() }))
             emit(Resource.Loading(isLoading = false))
         }
+    }
+
+    private suspend fun getOffLineSimilarShows(genre: List<Int>): List<TvShow> {
+        return CoroutineScope(Dispatchers.IO).async {
+            val shows = movieDatabase.tvDao.getAllShow().map { it.toTvShow("") }
+            shows.filter { show ->
+                genre.any { genreId ->
+                    show.genre_ids.contains(genreId)
+                }
+            }
+        }.await()
     }
 }

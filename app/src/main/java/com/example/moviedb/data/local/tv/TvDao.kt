@@ -18,6 +18,9 @@ interface TvDao {
     @Query("SELECT * FROM tv_series WHERE category =:category")
     fun getAllTvByCategory(category: String): List<TvEntity>
 
+    @Query("SELECT * FROM tv_series")
+    fun getAllShow(): List<TvEntity>
+
     @Query("SELECT * FROM tv_series WHERE inMyList =:favorite")
     fun getAllTvInMyList(favorite: Boolean = true): Flow<List<TvEntity>>
 

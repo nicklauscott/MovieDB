@@ -11,8 +11,8 @@ class GetSimilarTvShowLIst @Inject constructor(
     private val tvShowRepository: TvShowRepository
 ) {
 
-    suspend operator fun invoke(tvShowId: Int): Flow<Resource<List<TvShow>>>{
-        return tvShowRepository.getSimilarTvShows(tvShowId)
+    suspend operator fun invoke(tvShowId: Int, genre: List<Int>): Flow<Resource<List<TvShow>>>{
+        return tvShowRepository.getSimilarTvShows(tvShowId, genre)
     }
 
 }

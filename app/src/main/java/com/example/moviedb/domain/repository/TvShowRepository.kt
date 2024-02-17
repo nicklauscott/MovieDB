@@ -25,5 +25,5 @@ interface TvShowRepository {
 
     suspend fun getShowsInMyList(): Flow<Resource<List<TvShow>>>
 
-    suspend fun getSimilarTvShows(tvShowId: Int): Flow<Resource<List<TvShow>>>
+    suspend fun getSimilarTvShows(tvShowId: Int, genres: List<Int>): Flow<Resource<List<TvShow>>>
 }

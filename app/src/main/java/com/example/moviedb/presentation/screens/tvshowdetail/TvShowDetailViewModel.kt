@@ -114,7 +114,9 @@ class TvShowDetailViewModel @Inject constructor(
             TvShowDetailScreenUiEvent.SimilarShows -> {
                 viewModelScope.launch {
                     if (tvShowDetailScreenState.value.similarTvShows.isEmpty()) {
-                        tvDetailScreenUseCase.getSimilarTvShowLIst(tvShowDetailScreenState.value.tvShow?.id ?: -1)
+                        tvDetailScreenUseCase.getSimilarTvShowLIst(tvShowDetailScreenState.value.tvShow?.id ?: -1,
+                            tvShowDetailScreenState.value.tvShow?.genre_ids ?: emptyList()
+                        )
                             .collect {
                                 when (it) {
                                     is Resource.Error -> {}
