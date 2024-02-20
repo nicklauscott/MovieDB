@@ -7,6 +7,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.moviedb.presentation.screens.homescreen.HomeScreen
+import com.example.moviedb.presentation.screens.moviedetail.MoviesDetailScreen
 import com.example.moviedb.presentation.screens.search.SearchScreen
 import com.example.moviedb.presentation.screens.splash.SplashScreen
 import com.example.moviedb.presentation.screens.tvshowdetail.TvShowDetailScreen
@@ -34,6 +35,19 @@ fun Navigation() {
             )
         ) {
             TvShowDetailScreen(navController)
+        }
+
+        composable(
+            route = Screens.MovieDetail.route + "/{movie_id}",
+            arguments = listOf(
+                navArgument("movie_id") {
+                    type = NavType.IntType
+                    defaultValue = -1
+                    nullable = false
+                }
+            )
+        ) {
+            MoviesDetailScreen(navController)
         }
 
         composable(Screens.Search.route) {

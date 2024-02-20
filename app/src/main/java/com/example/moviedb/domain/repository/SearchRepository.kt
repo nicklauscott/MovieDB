@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.Flow
 interface SearchRepository {
 
     suspend fun searchMoviesAndTvShows(
+        path: String,
         localSearch: Boolean,
         searchQuery: String,
         adult: Boolean,

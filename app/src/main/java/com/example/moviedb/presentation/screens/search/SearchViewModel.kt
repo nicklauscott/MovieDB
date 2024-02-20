@@ -28,6 +28,7 @@ class SearchViewModel @Inject constructor(
                     }
                     viewModelScope.launch {
                         searchListUsecase(
+                            path = searchScreenState.value.type.pathName,
                             localSearch = false,
                             searchQuery = searchScreenState.value.searchQuery,
                             adult = !searchScreenState.value.safeSearch,
@@ -37,7 +38,7 @@ class SearchViewModel @Inject constructor(
                             when (it) {
                                 is Resource.Error -> {
                                     _searchScreenState.update { state ->
-                                        state.copy(message = it.message)
+                                        state.copy(message = it.message, isLoading = false)
                                     }
                                 }
                                 is Resource.Loading -> {
@@ -65,12 +66,18 @@ class SearchViewModel @Inject constructor(
                     it.copy(localSearch = !searchScreenState.value.localSearch)
                 }
             }
+            is SearchUiEvent.ChangeType -> {
+                _searchScreenState.update {
+                    it.copy(type = event.type)
+                }
+            }
             is SearchUiEvent.Search -> {
                 _searchScreenState.update {
                     it.copy(searchQuery = event.searchQuery)
                 }
                 viewModelScope.launch {
                     searchListUsecase(
+                        path = searchScreenState.value.type.pathName,
                         localSearch = searchScreenState.value.localSearch,
                         searchQuery = event.searchQuery,
                         adult = !searchScreenState.value.safeSearch,
@@ -80,7 +87,7 @@ class SearchViewModel @Inject constructor(
                         when (it) {
                             is Resource.Error -> {
                                 _searchScreenState.update { state ->
-                                    state.copy(message = it.message)
+                                    state.copy(message = it.message, isLoading = false)
                                 }
                             }
                             is Resource.Loading -> {

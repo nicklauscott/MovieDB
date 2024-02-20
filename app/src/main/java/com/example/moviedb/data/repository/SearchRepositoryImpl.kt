@@ -7,6 +7,7 @@ import com.example.moviedb.domain.model.Search
 import com.example.moviedb.domain.repository.SearchRepository
 import com.example.moviedb.util.Resource
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
@@ -21,6 +22,7 @@ class SearchRepositoryImpl @Inject constructor(
 ): SearchRepository {
 
     override suspend fun searchMoviesAndTvShows(
+        path: String,
         localSearch: Boolean,
         searchQuery: String,
         adult: Boolean,
@@ -31,31 +33,39 @@ class SearchRepositoryImpl @Inject constructor(
 
             // get from database
             if (localSearch) {
-                val searchMoviesFromDb =
-                    CoroutineScope(Dispatchers.IO).async{ movieDatabase.movieDao.searchMovieByName(searchQuery).map { it.toSearch() } }
-                val searchTvShowsFromDb =
-                    CoroutineScope(Dispatchers.IO).async{ movieDatabase.tvDao.searchTvByName(searchQuery).map { it.toSearch() } }
-                emit(Resource.Success(searchMoviesFromDb.await() + searchTvShowsFromDb.await().shuffled()))
+                if (path == "multi") {
+                    emit(Resource.Success(searchLocalMovies(searchQuery).await() + searchLocalTvShows(searchQuery).await().shuffled()))
+                    emit(Resource.Loading(false))
+                    return@flow
+                }
+
+                if (path == "tv") {
+                    emit(Resource.Success(searchLocalTvShows(searchQuery).await()))
+                    emit(Resource.Loading(false))
+                    return@flow
+                }
+
+                emit(Resource.Success(searchLocalMovies(searchQuery).await()))
                 emit(Resource.Loading(false))
                 return@flow
             }
 
             // search web
             val searchLIstFromRemote = try {
-                searchApi.searchMoviesAndTvShows(searchQuery, adult, page)
+                searchApi.searchMoviesAndTvShows(path, searchQuery, adult, page)
             } catch (ex: IOException) {
                 ex.printStackTrace()
-                emit(Resource.Error(message = "Error search movies"))
+                emit(Resource.Error(message = "Error searching movies"))
                 return@flow
             }
             catch (ex: HttpException) {
                 ex.printStackTrace()
-                emit(Resource.Error(message = "Error search movies"))
+                emit(Resource.Error(message = "Error searching movies"))
                 return@flow
             }
             catch (ex: Exception) {
                 ex.printStackTrace()
-                emit(Resource.Error(message = "Error search movies"))
+                emit(Resource.Error(message = "Error searching movies"))
                 return@flow
             }
 
@@ -64,5 +74,13 @@ class SearchRepositoryImpl @Inject constructor(
             return@flow
 
         }
+    }
+
+    private fun searchLocalMovies(searchQuery: String): Deferred<List<Search>> {
+        return CoroutineScope(Dispatchers.IO).async{ movieDatabase.movieDao.searchMovieByName(searchQuery).map { it.toSearch() } }
+    }
+
+    private fun searchLocalTvShows(searchQuery: String): Deferred<List<Search>> {
+        return CoroutineScope(Dispatchers.IO).async{ movieDatabase.tvDao.searchTvByName(searchQuery).map { it.toSearch() } }
     }
 }

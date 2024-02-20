@@ -393,7 +393,7 @@ class TvShowRepositoryImp @Inject constructor(
                 tvApi.getSimilarTvShows(tvShowId, 1)
             } catch (ex: IOException) {
                 ex.printStackTrace()
-                emit(Resource.Success(getOffLineSimilarShows(genres)))
+                emit(Resource.Success(getOffLineSimilarShows(tvShowId, genres)))
                 emit(Resource.Loading(isLoading = false))
                 return@flow
             }
@@ -415,14 +415,14 @@ class TvShowRepositoryImp @Inject constructor(
         }
     }
 
-    private suspend fun getOffLineSimilarShows(genre: List<Int>): List<TvShow> {
+    private suspend fun getOffLineSimilarShows(tvShowId: Int, genre: List<Int>): List<TvShow> {
         return CoroutineScope(Dispatchers.IO).async {
             val shows = movieDatabase.tvDao.getAllShow().map { it.toTvShow("") }
             shows.filter { show ->
                 genre.any { genreId ->
                     show.genre_ids.contains(genreId)
                 }
-            }
+            }.filter { it.id != tvShowId }
         }.await()
     }
 }

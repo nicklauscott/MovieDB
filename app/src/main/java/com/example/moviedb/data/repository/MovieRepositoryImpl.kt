@@ -4,7 +4,6 @@ import android.util.Log
 import com.example.moviedb.data.local.MovieDatabase
 import com.example.moviedb.data.mapper.toMovie
 import com.example.moviedb.data.mapper.toMovieEntity
-import com.example.moviedb.data.mapper.toTvShow
 import com.example.moviedb.data.remote.MovieApi
 import com.example.moviedb.domain.model.Movie
 import com.example.moviedb.domain.repository.MovieRepository
@@ -87,6 +86,24 @@ class MovieRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun addMovieToMyList(movieId: Int): Boolean {
+        CoroutineScope(Dispatchers.IO).launch {
+            movieDatabase.movieDao.getMovieById(movieId)?.let { movieEntity ->
+                movieDatabase.movieDao.insertMovie(movieEntity.copy(inMyList = true))
+            }
+        }.join()
+        return true
+    }
+
+    override suspend fun removeMovieFromMyList(movieId: Int): Boolean {
+        CoroutineScope(Dispatchers.IO).launch {
+            movieDatabase.movieDao.getMovieById(movieId)?.let { movieEntity ->
+                movieDatabase.movieDao.insertMovie(movieEntity.copy(inMyList = false))
+            }
+        }.join()
+        return false
+    }
+
     override suspend fun getMoviesInMyList(): Flow<Resource<List<Movie>>> {
         return flow {
             emit(Resource.Loading(isLoading = true))
@@ -97,7 +114,7 @@ class MovieRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getSimilarMovies(movieId: Int): Flow<Resource<List<Movie>>> {
+    override suspend fun getSimilarMovies(movieId: Int, genres: List<Int>): Flow<Resource<List<Movie>>> {
         return flow {
             emit(Resource.Loading(isLoading = true))
 
@@ -105,7 +122,8 @@ class MovieRepositoryImpl @Inject constructor(
                 movieApi.getSimilarMovies(movieId, 1)
             } catch (ex: IOException) {
                 ex.printStackTrace()
-                emit(Resource.Error(message = "Error loading movies"))
+                emit(Resource.Success(getOffLineSimilarMovies(movieId, genres)))
+                emit(Resource.Loading(isLoading = false))
                 return@flow
             }
             catch (ex: HttpException) {
@@ -122,5 +140,16 @@ class MovieRepositoryImpl @Inject constructor(
             emit(Resource.Success(similarMovieListDto.results.map { it.toMovie() }))
             emit(Resource.Loading(isLoading = false))
         }
+    }
+
+    private suspend fun getOffLineSimilarMovies(movieId: Int, genre: List<Int>): List<Movie> {
+        return CoroutineScope(Dispatchers.IO).async {
+            val movies = movieDatabase.movieDao.getAllMovies().map { it.toMovie("") }
+            movies.filter { movie ->
+                genre.any { genreId ->
+                    movie.genre_ids.contains(genreId)
+                }
+            }.filter { it.id != movieId }
+        }.await()
     }
 }

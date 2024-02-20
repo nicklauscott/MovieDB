@@ -27,7 +27,7 @@ class HomeScreenViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            homeScreenUseCase.getMovieList(true, homeScreenState.value.category, 1) { result ->
+            homeScreenUseCase.getMovieList(false, homeScreenState.value.category, 1) { result ->
                 result?.let { movieList ->
                     _homeScreenState.update {
                         it.copy(
@@ -38,7 +38,7 @@ class HomeScreenViewModel @Inject constructor(
                 }
             }
 
-            homeScreenUseCase.getTvShowList(true, homeScreenState.value.category, 1) { result ->
+            homeScreenUseCase.getTvShowList(false, homeScreenState.value.category, 1) { result ->
                 result?.let { tvList ->
                     _homeScreenState.update {
                         it.copy(tvShowList = tvList, tvListPage = 1)
@@ -139,7 +139,7 @@ class HomeScreenViewModel @Inject constructor(
                         _homeScreenState.update { it.copy(category = event.category, movieList = emptyList()) }
                         viewModelScope.launch {
                             homeScreenUseCase.getMovieList(
-                                true, event.category,
+                                false, event.category,
                                 1) { result ->
                                 result?.let { movieList ->
                                     _homeScreenState.update {
@@ -157,7 +157,7 @@ class HomeScreenViewModel @Inject constructor(
                         _homeScreenState.update { it.copy(category = event.category, tvShowList = emptyList()) }
                         viewModelScope.launch {
                             homeScreenUseCase.getTvShowList(
-                                true, event.category, 1) { result ->
+                                false, event.category, 1) { result ->
                                 result?.let { tvList ->
                                     _homeScreenState.update {
                                         it.copy(tvShowList = if (event.category == Category.MyList) tvList

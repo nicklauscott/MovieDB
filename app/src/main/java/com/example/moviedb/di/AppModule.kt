@@ -13,11 +13,14 @@ import com.example.moviedb.domain.repository.SearchRepository
 import com.example.moviedb.domain.repository.TvShowRepository
 import com.example.moviedb.domain.usecase.AddToMyList
 import com.example.moviedb.domain.usecase.GetEpisodeLIst
+import com.example.moviedb.domain.usecase.GetMovie
 import com.example.moviedb.domain.usecase.GetMovieList
+import com.example.moviedb.domain.usecase.GetSimilarMoviesLIst
 import com.example.moviedb.domain.usecase.GetSimilarTvShowLIst
 import com.example.moviedb.domain.usecase.GetTvShowDetail
 import com.example.moviedb.domain.usecase.GetTvShowList
 import com.example.moviedb.domain.usecase.HomeScreenUseCase
+import com.example.moviedb.domain.usecase.MovieDetailScreenUseCase
 import com.example.moviedb.domain.usecase.RemoveFromMyList
 import com.example.moviedb.domain.usecase.SearchListUsecase
 import com.example.moviedb.domain.usecase.TvDetailScreenUseCase
@@ -146,6 +149,19 @@ object AppModule {
         return SearchListUsecase(searchRepository)
     }
 
+
+    @Singleton
+    @Provides
+    fun provideGetMovieUsecase(movieRepository: MovieRepository): GetMovie{
+        return GetMovie(movieRepository)
+    }
+
+    @Singleton
+    @Provides
+    fun provideGetSimilarMoviesUsecase(movieRepository: MovieRepository): GetSimilarMoviesLIst{
+        return GetSimilarMoviesLIst(movieRepository)
+    }
+
     @Singleton
     @Provides
     fun provideHomeScreenUsecase(
@@ -164,6 +180,17 @@ object AppModule {
     ): TvDetailScreenUseCase =
         TvDetailScreenUseCase(getTvShowDetail, getEpisodeLIst, addToMyList, removeFromMyList, getSimilarTvShowLIst)
 
+
+
+    @Singleton
+    @Provides
+    fun provideMovieDetailUseCase(
+        getMovie: GetMovie,
+        getSimilarMoviesLIst: GetSimilarMoviesLIst,
+        addToMyList: AddToMyList,
+        removeFromMyList: RemoveFromMyList
+    ): MovieDetailScreenUseCase =
+        MovieDetailScreenUseCase(getMovie, getSimilarMoviesLIst, addToMyList, removeFromMyList)
 }
 
 

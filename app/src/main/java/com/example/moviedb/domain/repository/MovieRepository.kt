@@ -15,7 +15,11 @@ interface MovieRepository {
 
     suspend fun getAMovie(movieId: Int): Flow<Resource<Movie>>
 
+    suspend fun addMovieToMyList(movieId: Int): Boolean
+
+    suspend fun removeMovieFromMyList(movieId: Int): Boolean
+
     suspend fun getMoviesInMyList(): Flow<Resource<List<Movie>>>
 
-    suspend fun getSimilarMovies(movieId: Int): Flow<Resource<List<Movie>>>
+    suspend fun getSimilarMovies(movieId: Int, genres: List<Int>): Flow<Resource<List<Movie>>>
 }

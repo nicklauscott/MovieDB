@@ -11,8 +11,8 @@ class SearchListUsecase @Inject constructor (
 ) {
 
     suspend operator fun invoke(
-        localSearch: Boolean, searchQuery: String, adult: Boolean, page: Int
+        path: String, localSearch: Boolean, searchQuery: String, adult: Boolean, page: Int
     ): Flow<Resource<List<Search>>> {
-        return searchRepository.searchMoviesAndTvShows(localSearch, searchQuery, adult, page)
+        return searchRepository.searchMoviesAndTvShows(path, localSearch, searchQuery, adult, page)
     }
 }

@@ -83,11 +83,15 @@ fun SearchScreen(navController: NavController = rememberNavController(),
                 searchQuery = searchQuery.value,
                 onQueryChange = { newQuery ->
                     searchQuery.value = newQuery
-                    viewModel.onEvent(SearchUiEvent.Search(searchQuery.value))
+                    if (searchQuery.value.isNotBlank()) {
+                        viewModel.onEvent(SearchUiEvent.Search(searchQuery.value))
+                    }
                 },
                 onQueryClear = { searchQuery.value = "" }) {
                 keyboardController?.hide()
-                viewModel.onEvent(SearchUiEvent.Search(searchQuery.value))
+                if (searchQuery.value.isNotBlank()) {
+                    viewModel.onEvent(SearchUiEvent.Search(searchQuery.value))
+                }
             }
 
             LazyColumn(
@@ -101,10 +105,22 @@ fun SearchScreen(navController: NavController = rememberNavController(),
                         isLocal = state.value.localSearch,
                         onLocalChange = {
                             viewModel.onEvent(SearchUiEvent.ToggleLocalSearch)
+                            if (searchQuery.value.isNotBlank()) {
+                                viewModel.onEvent(SearchUiEvent.Search(searchQuery.value))
+                            }
                         },
                         isAdult = state.value.safeSearch,
                         onAdultChange = {
                             viewModel.onEvent(SearchUiEvent.ToggleSafeSearch)
+                            if (searchQuery.value.isNotBlank()) {
+                                viewModel.onEvent(SearchUiEvent.Search(searchQuery.value))
+                            }
+                        },
+                        onTypeChange = { type ->
+                            viewModel.onEvent(SearchUiEvent.ChangeType(type))
+                            if (searchQuery.value.isNotBlank()) {
+                                viewModel.onEvent(SearchUiEvent.Search(searchQuery.value))
+                            }
                         }) {
                         showSearchFilter.value = !showSearchFilter.value
                     }

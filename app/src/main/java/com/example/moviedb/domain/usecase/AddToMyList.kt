@@ -11,8 +11,7 @@ class AddToMyList @Inject constructor(
     private val tvShowRepository: TvShowRepository
 ) {
     suspend operator fun invoke(movie: Movie): Boolean {
-
-        return true
+        return movieRepository.addMovieToMyList(movie.id)
     }
 
     suspend operator fun invoke(tvShow: TvShow): Boolean {

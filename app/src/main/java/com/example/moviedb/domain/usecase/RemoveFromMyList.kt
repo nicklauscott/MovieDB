@@ -11,8 +11,7 @@ class RemoveFromMyList @Inject constructor(
     private val tvShowRepository: TvShowRepository
 ) {
     suspend operator fun invoke(movie: Movie): Boolean {
-
-        return true
+        return movieRepository.removeMovieFromMyList(movie.id)
     }
 
     suspend operator fun invoke(tvShow: TvShow): Boolean {

@@ -22,19 +22,4 @@ class GetTvShowDetail @Inject constructor(
             }
         }
     }
-
-//    suspend fun test(tvShowId: Int): Flow<Resource<TvShow>> {
-//        return tvShowRepository.test(tvShowId)
-//    }
-
-    suspend fun test(tvShowId: Int, result: (TvShow?, List<Episode>?) -> Unit) {
-        when (val tvShow = tvShowRepository.getAShow(tvShowId)) {
-            is Resource.Error -> {}
-            is Resource.Loading -> {}
-            is Resource.Success -> {
-                val episodes = tvShowRepository.getTvEpisodesBySeason(tvShowId, 1)
-                result(tvShow.data, episodes.data)
-            }
-        }
-    }
 }

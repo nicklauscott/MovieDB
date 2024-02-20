@@ -45,6 +45,7 @@ fun MovieEntity.toMovie(category: String): Movie =
         video = video,
         vote_average = vote_average,
         vote_count = vote_count,
+        inMyList = inMyList,
         genre_ids = try {
             genre_ids.split(",").map { it.toInt() }
         }catch (ex: Exception) {
