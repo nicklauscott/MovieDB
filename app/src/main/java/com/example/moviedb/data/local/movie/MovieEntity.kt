@@ -22,5 +22,12 @@ data class MovieEntity(
     val video: Boolean,
     val vote_average: Double,
     val vote_count: Int,
-    val inMyList: Boolean = false
+    val inMyList: Boolean = false,
+
+    val runtime: Int = -1,
+    val revenue: Int = -1,
+    val budget: Int = -1,
+    val status: String = "",
+    val production_companies: String = "",
+    val production_countries: String = "",
 )

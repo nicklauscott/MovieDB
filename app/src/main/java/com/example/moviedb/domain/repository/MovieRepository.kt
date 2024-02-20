@@ -21,5 +21,5 @@ interface MovieRepository {
 
     suspend fun getMoviesInMyList(): Flow<Resource<List<Movie>>>
 
-    suspend fun getSimilarMovies(movieId: Int, genres: List<Int>): Flow<Resource<List<Movie>>>
+    suspend fun getSimilarMovies(movieId: Int): Flow<Resource<List<Movie>>>
 }

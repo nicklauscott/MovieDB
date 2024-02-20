@@ -65,6 +65,17 @@ fun MovieDetailBody(movie: Movie, onclickAdd: () -> Unit) {
             Spacer(modifier = Modifier.width(8.dp))
 
             MatureRating(adult = movie.adult)
+
+            Spacer(modifier = Modifier.width(8.dp))
+
+            Text(
+                modifier = Modifier.padding(start = 4.dp),
+                text = movie.status,
+                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
+                fontSize = 14.sp,
+                maxLines = 1,
+                fontFamily = FontFamily.Monospace
+            )
         }
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -114,6 +125,54 @@ fun MovieDetailBody(movie: Movie, onclickAdd: () -> Unit) {
         Row(horizontalArrangement = Arrangement.Start) {
             Text(
                 modifier = Modifier.padding(start = 4.dp),
+                text = "Released Date:",
+                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
+                fontSize = 14.sp,
+                maxLines = 1,
+                fontFamily = FontFamily.Monospace
+            )
+            Spacer(modifier = Modifier.width(3.dp))
+            Text(
+                modifier = Modifier.padding(start = 4.dp),
+                text = movie.release_date,
+                color = MaterialTheme.colorScheme.onBackground,
+                fontSize = 16.sp,
+                maxLines = 1,
+                fontFamily = FontFamily.Serif
+            )
+        }
+
+
+        Spacer(modifier = Modifier.height(5.dp))
+
+        if (movie.runtime != -1) {
+            Row(horizontalArrangement = Arrangement.Start) {
+                Text(
+                    modifier = Modifier.padding(start = 4.dp),
+                    text = "Runtime:",
+                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
+                    fontSize = 14.sp,
+                    maxLines = 1,
+                    fontFamily = FontFamily.Monospace
+                )
+                Spacer(modifier = Modifier.width(3.dp))
+                Text(
+                    modifier = Modifier.padding(start = 4.dp),
+                    text = movie.runtime.toString() + " Min",
+                    color = MaterialTheme.colorScheme.onBackground,
+                    fontSize = 16.sp,
+                    maxLines = 1,
+                    fontFamily = FontFamily.Serif
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(5.dp))
+
+
+        Row(horizontalArrangement = Arrangement.Start) {
+            Text(
+                modifier = Modifier.padding(start = 4.dp),
                 text = "Original Language:",
                 color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
                 fontSize = 14.sp,
@@ -130,6 +189,58 @@ fun MovieDetailBody(movie: Movie, onclickAdd: () -> Unit) {
                 fontFamily = FontFamily.Serif
             )
         }
+
+        Spacer(modifier = Modifier.height(5.dp))
+
+        if (movie.budget != -1) {
+            Row(horizontalArrangement = Arrangement.Start) {
+                Text(
+                    modifier = Modifier.padding(start = 4.dp),
+                    text = "Production Budget:",
+                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
+                    fontSize = 14.sp,
+                    maxLines = 1,
+                    fontFamily = FontFamily.Monospace
+                )
+                Spacer(modifier = Modifier.width(3.dp))
+                Text(
+                    modifier = Modifier.padding(start = 4.dp),
+                    text = "$" + movie.budget.toString(),
+                    color = MaterialTheme.colorScheme.onBackground,
+                    fontSize = 16.sp,
+                    maxLines = 1,
+                    fontFamily = FontFamily.Serif
+                )
+            }
+        }
+
+
+        Spacer(modifier = Modifier.height(5.dp))
+
+        if (movie.revenue != -1) {
+            Row(horizontalArrangement = Arrangement.Start) {
+                Text(
+                    modifier = Modifier.padding(start = 4.dp),
+                    text = "Revenue:",
+                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
+                    fontSize = 14.sp,
+                    maxLines = 1,
+                    fontFamily = FontFamily.Monospace
+                )
+                Spacer(modifier = Modifier.width(3.dp))
+                Text(
+                    modifier = Modifier.padding(start = 4.dp),
+                    text = "$" + movie.revenue.toString(),
+                    color = MaterialTheme.colorScheme.onBackground,
+                    fontSize = 16.sp,
+                    maxLines = 1,
+                    fontFamily = FontFamily.Serif
+                )
+            }
+        }
+
+
+
 
 
         Spacer(modifier = Modifier.height(5.dp))
@@ -152,6 +263,52 @@ fun MovieDetailBody(movie: Movie, onclickAdd: () -> Unit) {
                 maxLines = 1,
                 fontFamily = FontFamily.Serif
             )
+        }
+
+        Spacer(modifier = Modifier.height(5.dp))
+
+        if (movie.production_countries.isNotBlank()) {
+            Row(horizontalArrangement = Arrangement.Start) {
+                Text(
+                    modifier = Modifier.padding(start = 4.dp),
+                    text = "Production Countries:",
+                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
+                    fontSize = 14.sp,
+                    maxLines = 1,
+                    fontFamily = FontFamily.Monospace
+                )
+                Spacer(modifier = Modifier.width(3.dp))
+                Text(
+                    modifier = Modifier.padding(start = 4.dp),
+                    text = movie.production_countries.substring(startIndex = 1, endIndex = movie.production_countries.length - 1),
+                    color = MaterialTheme.colorScheme.onBackground,
+                    fontSize = 16.sp,
+                    fontFamily = FontFamily.Serif
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(5.dp))
+
+        if (movie.production_companies.isNotBlank()) {
+            Row(horizontalArrangement = Arrangement.Start) {
+                Text(
+                    modifier = Modifier.padding(start = 4.dp),
+                    text = "Production Companies:",
+                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
+                    fontSize = 14.sp,
+                    maxLines = 1,
+                    fontFamily = FontFamily.Monospace
+                )
+                Spacer(modifier = Modifier.width(3.dp))
+                Text(
+                    modifier = Modifier.padding(start = 4.dp),
+                    text = movie.production_companies.substring(startIndex = 1, endIndex = movie.production_companies.length - 1),
+                    color = MaterialTheme.colorScheme.onBackground,
+                    fontSize = 16.sp,
+                    fontFamily = FontFamily.Serif
+                )
+            }
         }
 
         Spacer(modifier = Modifier.height(10.dp))

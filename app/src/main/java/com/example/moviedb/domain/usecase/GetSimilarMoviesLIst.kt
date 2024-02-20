@@ -10,8 +10,8 @@ class GetSimilarMoviesLIst @Inject constructor(
     private val movieRepository: MovieRepository
 ) {
 
-    suspend operator fun invoke(tvShowId: Int, genre: List<Int>): Flow<Resource<List<Movie>>>{
-        return movieRepository.getSimilarMovies(tvShowId, genre)
+    suspend operator fun invoke(tvShowId: Int): Flow<Resource<List<Movie>>>{
+        return movieRepository.getSimilarMovies(tvShowId)
     }
 
 }

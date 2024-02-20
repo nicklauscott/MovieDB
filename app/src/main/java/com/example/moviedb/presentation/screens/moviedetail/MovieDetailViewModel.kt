@@ -36,22 +36,23 @@ class MovieDetailViewModel @Inject constructor(
                         _movieDetailState.update { state ->
                             state.copy(movie = it.data)
                         }
+                    }
+                }
+            }
 
-                        movieDetailState.value.movie?.let {  movie ->
-                            movieDetailScreenUseCase.getSimilarMoviesLIst(movie.id, movie.genre_ids).collect { result ->
-                                when (result) {
-                                    is Resource.Error -> { }
-                                    is Resource.Loading -> {
-                                        _movieDetailState.update { state ->
-                                            state.copy(isSimilarMoviesLoading = result.isLoading)
-                                        }
-                                    }
-                                    is Resource.Success -> {
-                                        _movieDetailState.update { state ->
-                                            state.copy(similarMovies = result.data ?: emptyList())
-                                        }
-                                    }
-                                }
+
+            movieId?.let {  id ->
+                movieDetailScreenUseCase.getSimilarMoviesLIst(id).collect { result ->
+                    when (result) {
+                        is Resource.Error -> { }
+                        is Resource.Loading -> {
+                            _movieDetailState.update { state ->
+                                state.copy(isSimilarMoviesLoading = result.isLoading)
+                            }
+                        }
+                        is Resource.Success -> {
+                            _movieDetailState.update { state ->
+                                state.copy(similarMovies = result.data ?: emptyList())
                             }
                         }
                     }

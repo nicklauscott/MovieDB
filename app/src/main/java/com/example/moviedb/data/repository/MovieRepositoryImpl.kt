@@ -75,13 +75,38 @@ class MovieRepositoryImpl @Inject constructor(
         return flow {
             emit(Resource.Loading(isLoading = true))
 
-            val movie = movieDatabase.movieDao.getMovieById(movieId)
-            if (movie != null) {
-                emit(Resource.Success(data = movie.toMovie("")))
+            val movieDetailDto = try {
+                movieApi.getMovie(movieId)
+            } catch (ex: IOException) {
+                ex.printStackTrace()
+                val movie = movieDatabase.movieDao.getMovieById(movieId)
+                if (movie != null) {
+                    emit(Resource.Success(data = movie.toMovie("")))
+                    emit(Resource.Loading(isLoading = false))
+                    return@flow
+                }
+                emit(Resource.Error(message = "Error loading movies"))
                 emit(Resource.Loading(isLoading = false))
                 return@flow
             }
-            emit(Resource.Error(message = "No such movie"))
+            catch (ex: HttpException) {
+                ex.printStackTrace()
+                emit(Resource.Error(message = "Error loading movies"))
+                emit(Resource.Loading(isLoading = false))
+                return@flow
+            }
+            catch (ex: Exception) {
+                ex.printStackTrace()
+                emit(Resource.Error(message = "Error loading movies"))
+                emit(Resource.Loading(isLoading = false))
+                return@flow
+            }
+
+            val movie = movieDatabase.movieDao.getMovieById(movieId)
+            CoroutineScope(Dispatchers.IO).launch {
+                movieDatabase.movieDao.insertMovie(movieDetailDto.toMovieEntity().copy(inMyList = movie?.inMyList ?: false))
+            }
+            emit(Resource.Success(data = movieDetailDto.toMovieEntity().toMovie("").copy(inMyList = movie?.inMyList ?: false)))
             emit(Resource.Loading(isLoading = false))
         }
     }
@@ -114,7 +139,7 @@ class MovieRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getSimilarMovies(movieId: Int, genres: List<Int>): Flow<Resource<List<Movie>>> {
+    override suspend fun getSimilarMovies(movieId: Int): Flow<Resource<List<Movie>>> {
         return flow {
             emit(Resource.Loading(isLoading = true))
 
@@ -122,7 +147,7 @@ class MovieRepositoryImpl @Inject constructor(
                 movieApi.getSimilarMovies(movieId, 1)
             } catch (ex: IOException) {
                 ex.printStackTrace()
-                emit(Resource.Success(getOffLineSimilarMovies(movieId, genres)))
+                emit(Resource.Success(getOffLineSimilarMovies(movieId)))
                 emit(Resource.Loading(isLoading = false))
                 return@flow
             }
@@ -142,14 +167,15 @@ class MovieRepositoryImpl @Inject constructor(
         }
     }
 
-    private suspend fun getOffLineSimilarMovies(movieId: Int, genre: List<Int>): List<Movie> {
+    private suspend fun getOffLineSimilarMovies(movieId: Int): List<Movie> {
         return CoroutineScope(Dispatchers.IO).async {
-            val movies = movieDatabase.movieDao.getAllMovies().map { it.toMovie("") }
-            movies.filter { movie ->
-                genre.any { genreId ->
-                    movie.genre_ids.contains(genreId)
+            val genreIds = movieDatabase.movieDao.getMovieById(movieId)?.toMovie("")?.genre_ids ?: emptyList()
+            movieDatabase.movieDao.getAllMovies().map { it.toMovie("") }.filter { movieItem ->
+                genreIds.any { genre ->
+                    movieItem.genre_ids.contains(genre)
                 }
-            }.filter { it.id != movieId }
+            }.filter { it.id != movieId }.shuffled().take(10)
+
         }.await()
     }
 }
