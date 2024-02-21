@@ -8,14 +8,10 @@ import kotlinx.coroutines.flow.Flow
 
 interface TvShowRepository {
 
-    suspend fun test(tvShowId: Int, seasonNumber: Int): Flow<Resource<List<Episode>>>
     suspend fun getTvShows(
-        forceFetchFromRemote: Boolean,
-        category: String,
-        page: Int
-    ): Flow<Resource<List<TvShow>>>
-    suspend fun getAShow(tvShowId: Int): Resource<TvShow> // test
-    suspend fun getTvEpisodesBySeason(tvShowId: Int, seasonNumber: Int): Resource<List<Episode>> // test
+        forceFetchFromRemote: Boolean, category: String, page: Int): Flow<Resource<List<TvShow>>>
+    suspend fun getTvEpisodesBySeason(tvShowId: Int, seasonNumber: Int): Flow<Resource<List<Episode>>>
+    suspend fun getAShow(tvShowId: Int): Resource<TvShow>
 
     suspend fun getAnEpisode(tvShowId: Int, seasonNumber: Int, episodeId: Int): Flow<Resource<Episode>>
 

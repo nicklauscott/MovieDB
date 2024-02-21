@@ -26,14 +26,14 @@ class TvShowDetailViewModel @Inject constructor(
         viewModelScope.launch {
             val tvShowId = savedStateHandle.get<Int>("show_id")
             launch(Dispatchers.IO) {
-                tvDetailScreenUseCase.getTvShowDetail(tvShowId ?: -1) { tvShow ->
+                tvDetailScreenUseCase.getTvShow(tvShowId ?: -1) { tvShow ->
                     _tvShowDetailScreenState.update {
                         it.copy(tvShow = tvShow, isEpisodeLoading = false)
                     }
                 }
             }.join()
 
-            tvDetailScreenUseCase.getEpisodeLIst.test(tvShowId ?: -1, 1).collect {
+            tvDetailScreenUseCase.getEpisodeLIst(tvShowId ?: -1, 1).collect {
                 when (it) {
                     is Resource.Error -> {
                         _tvShowDetailScreenState.update { state ->
@@ -89,7 +89,7 @@ class TvShowDetailViewModel @Inject constructor(
                 viewModelScope.launch {
                     _tvShowDetailScreenState.value.tvShow?.let { tvShow ->
 
-                        tvDetailScreenUseCase.getEpisodeLIst.test(tvShow.id, event.season).collect {
+                        tvDetailScreenUseCase.getEpisodeLIst(tvShow.id, event.season).collect {
                             when (it) {
                                 is Resource.Error -> {
                                     _tvShowDetailScreenState.update { state ->

@@ -7,7 +7,6 @@ import com.example.moviedb.data.remote.MovieApi
 import com.example.moviedb.data.remote.TvApi
 import com.example.moviedb.data.cache.CacheManger
 import com.example.moviedb.data.remote.SearchApi
-import com.example.moviedb.data.repository.SearchRepositoryImpl
 import com.example.moviedb.domain.repository.MovieRepository
 import com.example.moviedb.domain.repository.SearchRepository
 import com.example.moviedb.domain.repository.TvShowRepository
@@ -17,7 +16,7 @@ import com.example.moviedb.domain.usecase.GetMovie
 import com.example.moviedb.domain.usecase.GetMovieList
 import com.example.moviedb.domain.usecase.GetSimilarMoviesLIst
 import com.example.moviedb.domain.usecase.GetSimilarTvShowLIst
-import com.example.moviedb.domain.usecase.GetTvShowDetail
+import com.example.moviedb.domain.usecase.GetTvShow
 import com.example.moviedb.domain.usecase.GetTvShowList
 import com.example.moviedb.domain.usecase.HomeScreenUseCase
 import com.example.moviedb.domain.usecase.MovieDetailScreenUseCase
@@ -111,8 +110,8 @@ object AppModule {
 
     @Singleton
     @Provides
-    fun provideGetTvShowDetailUsecase(tvShowRepository: TvShowRepository): GetTvShowDetail{
-        return GetTvShowDetail(tvShowRepository)
+    fun provideGetTvShowDetailUsecase(tvShowRepository: TvShowRepository): GetTvShow{
+        return GetTvShow(tvShowRepository)
     }
 
     @Singleton
@@ -172,13 +171,13 @@ object AppModule {
     @Singleton
     @Provides
     fun provideTvDetailScreenUsecase(
-        getTvShowDetail: GetTvShowDetail,
+        getTvShow: GetTvShow,
         getEpisodeLIst: GetEpisodeLIst,
         addToMyList: AddToMyList,
         removeFromMyList: RemoveFromMyList,
         getSimilarTvShowLIst: GetSimilarTvShowLIst
     ): TvDetailScreenUseCase =
-        TvDetailScreenUseCase(getTvShowDetail, getEpisodeLIst, addToMyList, removeFromMyList, getSimilarTvShowLIst)
+        TvDetailScreenUseCase(getTvShow, getEpisodeLIst, addToMyList, removeFromMyList, getSimilarTvShowLIst)
 
 
 

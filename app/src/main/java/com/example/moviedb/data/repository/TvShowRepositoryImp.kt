@@ -36,87 +36,6 @@ class TvShowRepositoryImp @Inject constructor(
     private val cacheManager: CacheManger
 ): TvShowRepository {
 
-
-    suspend fun test1(tvShowId: Int): Flow<Resource<TvShow>> {
-       return  flow {
-           emit(Resource.Loading(true))
-
-           // get tvShow from cache
-           val tvInCache = cacheManager.getFromCache(tvShowId)
-           if (tvInCache != null) {
-               emit(Resource.Success(tvInCache.tvEntity.toTvShow("")))
-               emit(Resource.Loading(false))
-           }
-
-           // get tvShow from database
-           val tvInDb = movieDatabase.tvDao.getTvById(tvShowId)
-           if (tvInDb != null) {
-
-               // cache from database if tvShow is in my list
-               if (tvInDb.inMyList) {
-                   emit(Resource.Success(tvInDb.toTvShow("")))
-                   /* CoroutineScope(Dispatchers.Unconfined).launch{ */ cacheManager.addToCache(tvShowId, localCache(tvInDb)) // }
-                   emit(Resource.Loading(false))
-                   return@flow
-               }
-
-               // cache from remote if tvShow is not in my list
-               val tvShowDetailDto = try {
-                   tvApi.getATvShow(tvShowId)
-               } catch (ex: IOException) {
-                   ex.printStackTrace()
-                   emit(Resource.Error(message = "Error loading shows"))
-                   emit(Resource.Loading(false))
-                   return@flow
-               }
-               catch (ex: HttpException) {
-                   ex.printStackTrace()
-                   emit(Resource.Error(message = "Error loading shows"))
-                   emit(Resource.Loading(false))
-                   return@flow
-               }
-               catch (ex: Exception) {
-                   ex.printStackTrace()
-                   emit(Resource.Error(message = "Error loading shows"))
-                   emit(Resource.Loading(false))
-                   return@flow
-               }
-
-               cacheManager.addToCache(tvShowId, remoteCache(tvShowDetailDto))
-               emit(Resource.Success(tvInDb.toTvShow("").copy(season_count = tvShowDetailDto.seasons?.size ?: 1)))
-               emit(Resource.Loading(false))
-           }
-
-           // get tvShow from remote
-           val tvShowDetailDto = try {
-               tvApi.getATvShow(tvShowId)
-           } catch (ex: IOException) {
-               ex.printStackTrace()
-               emit(Resource.Error(message = "Error loading shows"))
-                   emit(Resource.Loading(false))
-                   return@flow
-           }
-           catch (ex: HttpException) {
-               ex.printStackTrace()
-               emit(Resource.Error(message = "Error loading shows"))
-                   emit(Resource.Loading(false))
-                   return@flow
-           }
-           catch (ex: Exception) {
-               ex.printStackTrace()
-               emit(Resource.Error(message = "Error loading shows"))
-                   emit(Resource.Loading(false))
-                   return@flow
-           }
-
-           // emit and cache the tvShow
-           cacheManager.addToCache(tvShowId, remoteCache(tvShowDetailDto))
-           emit(Resource.Success(tvShowDetailDto.toTvEntity().toTvShow("")))
-           emit(Resource.Loading(false))
-       }
-    }
-
-
     override suspend fun getTvShows(
         forceFetchFromRemote: Boolean,
         category: String,
@@ -131,7 +50,7 @@ class TvShowRepositoryImp @Inject constructor(
             if (loadLocalMove) {
                 emit(Resource.Success(localTvList.await().map { tvEntity ->
                     tvEntity.toTvShow(category)
-                }
+                }.shuffled()
                 ))
                 emit(Resource.Loading(isLoading = false))
                 return@flow
@@ -155,13 +74,13 @@ class TvShowRepositoryImp @Inject constructor(
                 return@flow
             }
 
-            val movieEntities = movieLIstFromRemote.results.let {
+            val tvShowEntities = movieLIstFromRemote.results.let {
                 it.map { tvDto ->
                     tvDto.toTvEntity(category) }
             }
 
-            CoroutineScope(Dispatchers.Default).launch { movieDatabase.tvDao.upsertTvList(movieEntities) }
-            emit(Resource.Success(movieEntities.map { it.toTvShow(category) }))
+            CoroutineScope(Dispatchers.Default).launch { movieDatabase.tvDao.upsertTvList(tvShowEntities) }
+            emit(Resource.Success(tvShowEntities.map { it.toTvShow(category) }.shuffled()))
             emit(Resource.Loading(isLoading = false))
         }
     }
@@ -226,7 +145,7 @@ class TvShowRepositoryImp @Inject constructor(
         return Resource.Success(tvShowDetailDto.toTvEntity().toTvShow(""))
     }
 
-     override suspend fun test(tvShowId: Int, seasonNumber: Int): Flow<Resource<List<Episode>>>{
+     override suspend fun getTvEpisodesBySeason(tvShowId: Int, seasonNumber: Int): Flow<Resource<List<Episode>>>{
         return flow {
             cacheManager.getFlowFromCache(tvShowId).collect {
                 when (it) {
@@ -247,17 +166,6 @@ class TvShowRepositoryImp @Inject constructor(
                 }
             }
         }
-    }
-
-    override suspend fun getTvEpisodesBySeason(tvShowId: Int, seasonNumber: Int): Resource<List<Episode>>{
-        val getFromCache = cacheManager.getFromCache(tvShowId)
-        if (getFromCache != null) {
-            val seasonOrNull = getFromCache.seasons.find { it.seasonNumber == seasonNumber }
-            seasonOrNull?.let { season ->
-                return Resource.Success(season.episodes.map { it.toEpisode() })
-            }
-        }
-        return Resource.Error(message = "Error loading shows")
     }
 
     override suspend fun getAnEpisode(tvShowId: Int, seasonNumber: Int, episodeId: Int): Flow<Resource<Episode>> {

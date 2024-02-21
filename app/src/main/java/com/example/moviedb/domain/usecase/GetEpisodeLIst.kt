@@ -9,16 +9,7 @@ import javax.inject.Inject
 class GetEpisodeLIst @Inject constructor(
     private val tvShowRepository: TvShowRepository
 ) {
-
-    suspend operator fun invoke(tvShowId: Int, seasonNUmber: Int): List<Episode>?{
-        return when (val episodes = tvShowRepository.getTvEpisodesBySeason(tvShowId, seasonNUmber)) {
-            is Resource.Success -> episodes.data
-            else -> null
-        }
+    suspend operator fun invoke(tvShowId: Int, seasonNUmber: Int): Flow<Resource<List<Episode>>> {
+        return tvShowRepository.getTvEpisodesBySeason(tvShowId, seasonNUmber)
     }
-
-    suspend fun test(tvShowId: Int, seasonNUmber: Int): Flow<Resource<List<Episode>>> {
-        return tvShowRepository.test(tvShowId, seasonNUmber)
-    }
-
 }
