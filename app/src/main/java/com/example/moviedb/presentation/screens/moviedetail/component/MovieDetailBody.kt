@@ -267,7 +267,9 @@ fun MovieDetailBody(movie: Movie, onclickAdd: () -> Unit) {
 
         Spacer(modifier = Modifier.height(5.dp))
 
-        if (movie.production_countries.isNotBlank()) {
+        val productionCountries = movie.production_countries
+            .substring(startIndex = 1, endIndex = movie.production_countries.length - 1)
+        if (productionCountries.isNotBlank()) {
             Row(horizontalArrangement = Arrangement.Start) {
                 Text(
                     modifier = Modifier.padding(start = 4.dp),
@@ -280,7 +282,7 @@ fun MovieDetailBody(movie: Movie, onclickAdd: () -> Unit) {
                 Spacer(modifier = Modifier.width(3.dp))
                 Text(
                     modifier = Modifier.padding(start = 4.dp),
-                    text = movie.production_countries.substring(startIndex = 1, endIndex = movie.production_countries.length - 1),
+                    text = productionCountries,
                     color = MaterialTheme.colorScheme.onBackground,
                     fontSize = 16.sp,
                     fontFamily = FontFamily.Serif
@@ -290,7 +292,9 @@ fun MovieDetailBody(movie: Movie, onclickAdd: () -> Unit) {
 
         Spacer(modifier = Modifier.height(5.dp))
 
-        if (movie.production_companies.isNotBlank()) {
+        val productionCompanies = movie.production_companies
+            .substring(startIndex = 1, endIndex = movie.production_companies.length - 1)
+        if (productionCompanies.isNotBlank()) {
             Row(horizontalArrangement = Arrangement.Start) {
                 Text(
                     modifier = Modifier.padding(start = 4.dp),
@@ -303,7 +307,7 @@ fun MovieDetailBody(movie: Movie, onclickAdd: () -> Unit) {
                 Spacer(modifier = Modifier.width(3.dp))
                 Text(
                     modifier = Modifier.padding(start = 4.dp),
-                    text = movie.production_companies.substring(startIndex = 1, endIndex = movie.production_companies.length - 1),
+                    text = productionCompanies,
                     color = MaterialTheme.colorScheme.onBackground,
                     fontSize = 16.sp,
                     fontFamily = FontFamily.Serif

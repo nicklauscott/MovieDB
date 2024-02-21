@@ -55,21 +55,13 @@ fun MovieDBTheme(
         else -> LightColorScheme
     }
     val view = LocalView.current
-    if (!view.isInEditMode) {
-        SideEffect {
-            val window = (view.context as Activity).window
-            window.statusBarColor = colorScheme.background.toArgb()
-            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = darkTheme
-        }
-    }
     SideEffect {
         val window = (view.context as Activity).window
         window.statusBarColor = colorScheme.background.toArgb()
         if (!darkTheme) window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
-        else View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR.inv()
+
 
     }
-
 
     MaterialTheme(
         colorScheme = colorScheme,
