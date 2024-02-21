@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
@@ -17,14 +18,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.moviedb.presentation.component.DetailScreenTopBar
 import com.example.moviedb.presentation.component.MovieItem
-import com.example.moviedb.presentation.component.TvShowItem
 import com.example.moviedb.presentation.navigation.Screens
 import com.example.moviedb.presentation.screens.moviedetail.component.MovieDetailBody
 import com.example.moviedb.presentation.screens.moviedetail.component.MovieDetailHeader
@@ -61,7 +61,7 @@ fun MoviesDetailScreen(navController: NavController, viewModel: MovieDetailViewM
                         ) {
                             Text(
                                 text = "Error getting movie",
-                                color = Color.White.copy(alpha = 0.8f),
+                                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.8f),
                                 fontSize = 15.sp,
                                 style = MaterialTheme.typography.bodyMedium,
                                 fontFamily = FontFamily.Serif
@@ -96,12 +96,14 @@ fun MoviesDetailScreen(navController: NavController, viewModel: MovieDetailViewM
                                     else -> {
                                         if (state.value.similarMovies.isEmpty()) {
                                             Box(
-                                                modifier = Modifier.fillMaxSize(),
+                                                modifier = Modifier
+                                                    .height(200.dp)
+                                                    .fillMaxWidth(),
                                                 contentAlignment = Alignment.Center
                                             ) {
                                                 Text(
                                                     text = "Oops! No similar movies available",
-                                                    color = Color.White.copy(alpha = 0.8f),
+                                                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.8f),
                                                     fontSize = 15.sp,
                                                     style = MaterialTheme.typography.bodyMedium,
                                                     fontFamily = FontFamily.Serif

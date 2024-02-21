@@ -70,7 +70,7 @@ fun SearchScreen(navController: NavController = rememberNavController(),
                     // search icon
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(imageVector = Icons.Rounded.ArrowBack, contentDescription = null,
-                            tint = Color.White.copy(alpha = 0.8f))
+                            tint = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.8f))
                     }
                 }
             }
@@ -152,7 +152,7 @@ fun SearchScreen(navController: NavController = rememberNavController(),
                                 ) {
                                     Text(
                                         text = state.value.message ?: "Oops! Couldn't find any movies with such name",
-                                        color = Color.White.copy(alpha = 0.8f),
+                                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.8f),
                                         fontSize = 15.sp,
                                         style = MaterialTheme.typography.bodyMedium,
                                         fontFamily = FontFamily.Serif
@@ -162,7 +162,11 @@ fun SearchScreen(navController: NavController = rememberNavController(),
                         } else {
                             items(state.value.searchList.size) { index ->
                                 SearchItem(search = state.value.searchList[index]) {searchItem ->
-                                    if (searchItem.media_type == "tv") {
+                                    if (state.value.type == Type.Both && searchItem.media_type == "tv") {
+                                        navController.navigate(Screens.TvShowDetail.withArg(searchItem.id.toString()))
+                                        return@SearchItem
+                                    }
+                                    if (state.value.type == Type.TvShows) {
                                         navController.navigate(Screens.TvShowDetail.withArg(searchItem.id.toString()))
                                         return@SearchItem
                                     }

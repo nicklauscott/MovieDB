@@ -54,14 +54,13 @@ fun AppTopBar(
                 isMovieScreen = homeScreenState.isMovieListScreen,
                 currentCategory = currentCategory.value.uiValue
             ) { selectedCategory ->
-                //currentCategory.value = selectedCategory.uiValue
                 onChangeCategory(selectedCategory)
             }
 
             // search icon
             IconButton(onClick = onClickSearch) {
                 Icon(imageVector = Icons.Rounded.Search, contentDescription = null,
-                    tint = Color.White.copy(alpha = 0.8f))
+                    tint = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.8f))
             }
         }
     }

@@ -91,7 +91,7 @@ fun SearchItem(
                 ) {
                     Text(
                         text = "TV",
-                        color = Color.White.copy(alpha = 0.8f),
+                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
                         fontSize = 15.sp,
                         style = MaterialTheme.typography.bodyMedium,
                         fontFamily = FontFamily.Serif,
@@ -111,7 +111,7 @@ fun SearchItem(
 
             Text(
                 text = search.name,
-                color = Color.White.copy(alpha = 0.8f),
+                color = MaterialTheme.colorScheme.onBackground,
                 fontSize = 15.sp,
                 style = MaterialTheme.typography.bodyMedium,
                 fontFamily = FontFamily.Serif
@@ -122,7 +122,7 @@ fun SearchItem(
             Text(
                 text = if (search.media_type == "tv") search.first_air_date.split("-")[0]
                 else search.release_date.split("-")[0],
-                color = Color.White.copy(alpha = 0.6f),
+                color = MaterialTheme.colorScheme.onBackground,
                 fontSize = 13.sp,
                 style = MaterialTheme.typography.bodyMedium,
                 fontFamily = FontFamily.Serif

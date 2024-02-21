@@ -78,7 +78,7 @@ fun FilterSection(showOption: Boolean,
                 ) {
                     Text(
                         text = "Local search",
-                        color = Color.White.copy(alpha = 0.5f),
+                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
                         fontSize = 18.sp,
                         style = MaterialTheme.typography.headlineMedium,
                         fontFamily = FontFamily.Serif
@@ -100,7 +100,7 @@ fun FilterSection(showOption: Boolean,
                 ) {
                     Text(
                         text = "Safe search",
-                        color = Color.White.copy(alpha = 0.5f),
+                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
                         fontSize = 18.sp,
                         style = MaterialTheme.typography.headlineMedium,
                         fontFamily = FontFamily.Serif
@@ -122,7 +122,7 @@ fun FilterSection(showOption: Boolean,
                 ) {
                     Text(
                         text = "Media Type",
-                        color = Color.White.copy(alpha = 0.5f),
+                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
                         fontSize = 18.sp,
                         style = MaterialTheme.typography.headlineMedium,
                         fontFamily = FontFamily.Serif
@@ -162,7 +162,7 @@ fun TypeOptions(type: Type, selectedType: Type, onTypeChange: (Type) -> Unit) {
         )
         Text(
             text = type.toString(),
-            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
+            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
             style = MaterialTheme.typography.bodySmall,
             fontFamily = FontFamily.Serif,
             modifier = Modifier.padding(start = 5.dp)

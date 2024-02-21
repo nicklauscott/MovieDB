@@ -153,7 +153,8 @@ fun TvShowDetailHeader(
                     fontSize = 19.sp,
                     fontWeight = FontWeight.SemiBold,
                     overflow = TextOverflow.Ellipsis,
-                    fontFamily = FontFamily.Serif
+                    fontFamily = FontFamily.Serif,
+                    color = Color.White
                 )
 
                 Spacer(modifier = Modifier.height(3.dp))

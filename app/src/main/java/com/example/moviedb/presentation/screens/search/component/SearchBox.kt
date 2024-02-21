@@ -61,7 +61,7 @@ fun SearchBox(searchQuery: String,
             if (searchQuery.isBlank()) {
                 Text(
                     text = "Search movies or shows",
-                    color = Color.White.copy(alpha = 0.5f),
+                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
                     fontSize = 18.sp,
                     style = MaterialTheme.typography.headlineMedium,
                     fontFamily = FontFamily.Serif

@@ -49,13 +49,13 @@ fun DetailScreenTopBar(
             // search icon
             IconButton(onClick = onClickBack) {
                 Icon(imageVector = Icons.Rounded.ArrowBack, contentDescription = null,
-                    tint = Color.White.copy(alpha = 0.8f))
+                    tint = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.8f))
             }
 
             // search icon
             IconButton(onClick = onClickSearch) {
                 Icon(imageVector = Icons.Rounded.Search, contentDescription = null,
-                    tint = Color.White.copy(alpha = 0.8f))
+                    tint = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.8f))
             }
         }
     }

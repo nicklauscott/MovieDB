@@ -148,13 +148,13 @@ fun TvShowDetailScreen(
                                     if (state.value.similarTvShows.isEmpty()) {
                                         Box(
                                             modifier = Modifier
-                                                .height(500.dp)
+                                                .height(200.dp)
                                                 .fillMaxWidth(),
                                             contentAlignment = Alignment.Center
                                         ) {
                                             Text(
                                                 text = "Oops! No similar tv show available",
-                                                color = Color.White.copy(alpha = 0.8f),
+                                                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.8f),
                                                 fontSize = 15.sp,
                                                 style = MaterialTheme.typography.bodyMedium,
                                                 fontFamily = FontFamily.Serif

@@ -177,7 +177,7 @@ fun EpisodeCell(episode: Episode, onClick: (Episode) -> Unit) {
                 episode.overview.take(120) + if (episode.overview.length >= 123) "..." else ""
             }
             else episode.overview,
-            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
+            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.8f),
             fontSize = 14.sp,
             fontFamily = FontFamily.Serif
         )
