@@ -194,7 +194,6 @@ class TvShowRepositoryImp @Inject constructor(
                 showFromCache.seasons.forEach {  season ->
                     movieDatabase.episodeDao.upsertEpisodeList(season.episodes)
                 }
-
                 val updatedTvShow = showFromCache.tvEntity.copy(
                     inMyList = true, season_count = showFromCache.numberOfSeason)
 

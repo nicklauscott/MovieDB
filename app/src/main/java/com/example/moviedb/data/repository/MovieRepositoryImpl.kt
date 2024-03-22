@@ -1,6 +1,5 @@
 package com.example.moviedb.data.repository
 
-import android.util.Log
 import com.example.moviedb.data.local.MovieDatabase
 import com.example.moviedb.data.mapper.toMovie
 import com.example.moviedb.data.mapper.toMovieEntity

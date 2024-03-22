@@ -33,3 +33,5 @@ interface TvDao {
     @Query("SELECT * FROM tv_series WHERE name LIKE '%' || :searchQuery || '%'")
     fun searchTvByName(searchQuery: String): List<TvEntity>
 }
+
+class A

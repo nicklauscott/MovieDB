@@ -2,6 +2,12 @@
 <project version="4">
   <component name="deploymentTargetDropDown">
     <value>
+      <entry key="Tests in 'com'">
+        <State />
+      </entry>
+      <entry key="TvDaoTest">
+        <State />
+      </entry>
       <entry key="app">
         <State>
           <runningDeviceTargetSelectedWithDropDown>
@@ -17,6 +23,15 @@
           </runningDeviceTargetSelectedWithDropDown>
           <timeTargetWasSelectedWithDropDown value="2024-02-17T21:04:52.054150Z" />
         </State>
+      </entry>
+      <entry key="getAllTvInMyList()">
+        <State />
+      </entry>
+      <entry key="getMovies()">
+        <State />
+      </entry>
+      <entry key="searchMovies()">
+        <State />
       </entry>
     </value>
   </component>
