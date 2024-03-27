@@ -73,6 +73,8 @@ class FakeMovieRepository(
     override suspend fun getMoviesInMyList(): Flow<Resource<List<Movie>>> {
         return flow {
             emit(Resource.Loading(true))
+            emit(Resource.Success(movies.filter { it.inMyList == true }))
+            emit(Resource.Loading(false))
         }
     }
 

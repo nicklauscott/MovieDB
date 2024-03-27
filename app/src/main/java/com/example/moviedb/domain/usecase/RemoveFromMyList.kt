@@ -15,7 +15,6 @@ class RemoveFromMyList @Inject constructor(
     }
 
     suspend operator fun invoke(tvShow: TvShow): Boolean {
-        tvShowRepository.removeShowFromMyList(tvShow.id)
-        return true
+        return tvShowRepository.removeShowFromMyList(tvShow.id)
     }
 }

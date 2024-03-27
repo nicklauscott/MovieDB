@@ -64,7 +64,7 @@ class TvShowDetailViewModel @Inject constructor(
                             it.copy(tvShow = _tvShowDetailScreenState.value.tvShow?.copy(inMyList = null))
                         }
                         tvShowDetailScreenState.value.tvShow?.let {
-                            val result = tvDetailScreenUseCase.removeFromMyList(it)
+                            val result = tvDetailScreenUseCase.removeFromMyList(it)  // investigate more
                             _tvShowDetailScreenState.update { state ->
                                 state.copy(tvShow = _tvShowDetailScreenState.value.tvShow?.copy(inMyList = !result))
                             }

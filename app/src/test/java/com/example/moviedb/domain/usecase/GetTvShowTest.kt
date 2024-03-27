@@ -36,7 +36,7 @@ class GetTvShowTest {
     }
 
     @Test
-    fun `getTvShow should return null if tv show is unavailable`() = runTest {
+    fun `getTvShow should return null if the tv show is unavailable`() = runTest {
         getTvShow(7659) { result ->
             assertThat(result).isEqualTo(null)
         }

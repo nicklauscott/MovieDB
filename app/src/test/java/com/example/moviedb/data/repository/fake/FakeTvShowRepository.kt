@@ -6,6 +6,8 @@ import com.example.moviedb.domain.repository.TvShowRepository
 import com.example.moviedb.util.Resource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 
 class FakeTvShowRepository(
     private val tvShows:  MutableList<TvShow> = mutableListOf(),
@@ -64,7 +66,12 @@ class FakeTvShowRepository(
         val show = tvShows.find { it.id == tvShowId }
         if (show != null && show.inMyList == false) {
             tvShows.removeIf { it.id == tvShowId }.also {  update ->
-                if (update) tvShows.add(show.copy(inMyList = true))
+                if (update) tvShows.add(
+                    mock<TvShow>().apply {
+                        whenever(id).thenReturn(tvShowId)
+                        whenever(inMyList).thenReturn(true)
+                    }
+                )
                 return true
             }
         }
@@ -73,11 +80,13 @@ class FakeTvShowRepository(
 
     override suspend fun removeShowFromMyList(tvShowId: Int): Boolean {
         val show = tvShows.find { it.id == tvShowId }
-        if (show != null && show.inMyList == true) {
-            tvShows.removeIf { it.id == tvShowId }.also {  update ->
-                if (update) tvShows.add(show.copy(inMyList = false))
-                return true
-            }
+        if (show?.inMyList == true) {
+            tvShows.removeIf { it.id == tvShowId }
+            tvShows.add(mock<TvShow>().apply {
+                whenever(id).thenReturn(tvShowId)
+                whenever(inMyList).thenReturn(false)
+            })
+            return true
         }
         return false
     }

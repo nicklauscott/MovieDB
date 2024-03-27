@@ -2,10 +2,13 @@
 <project version="4">
   <component name="deploymentTargetDropDown">
     <value>
-      <entry key="Tests in 'com'">
+      <entry key="EpisodeDaoTest">
         <State />
       </entry>
-      <entry key="TvDaoTest">
+      <entry key="FakeSearchRepositoryTest">
+        <State />
+      </entry>
+      <entry key="Tests in 'com'">
         <State />
       </entry>
       <entry key="app">
@@ -24,13 +27,7 @@
           <timeTargetWasSelectedWithDropDown value="2024-02-17T21:04:52.054150Z" />
         </State>
       </entry>
-      <entry key="getAllTvInMyList()">
-        <State />
-      </entry>
-      <entry key="getMovies()">
-        <State />
-      </entry>
-      <entry key="searchMovies()">
+      <entry key="searchMoviesAndTvShows_shouldReturnMoviesAndTvShows_ifPathIsMulti()">
         <State />
       </entry>
     </value>

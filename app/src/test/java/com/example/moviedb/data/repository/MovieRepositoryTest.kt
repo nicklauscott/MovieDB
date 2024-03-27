@@ -69,6 +69,12 @@ class MovieRepositoryTest {
     }
 
     @Test
+    fun `getMoviesInMyList should return movies in my list`() = runTest {
+        val result = repository.getMoviesInMyList().toList()
+        assertThat(result[1].data?.size).isEqualTo(3)
+    }
+
+    @Test
     fun `getAMovie should return the right movie if available`() = runTest {
         val result = repository.getAMovie(1001).toList()
         assertThat(result[1].data?.id).isEqualTo(1001)

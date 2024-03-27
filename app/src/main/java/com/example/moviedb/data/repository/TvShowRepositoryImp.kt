@@ -213,7 +213,7 @@ class TvShowRepositoryImp @Inject constructor(
             }
             movieDatabase.episodeDao.removeEpisodes(tvShowId)
         }.join()
-        return false
+        return true
     }
 
     override suspend fun getShowsInMyList(): Flow<Resource<List<TvShow>>> {
