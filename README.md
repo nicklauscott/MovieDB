@@ -66,7 +66,7 @@ Based on the UI design and functionality, this appears to be built with:
 
 ### Prerequisites
 - Android Studio
-- Android SDK (API level XX or higher)
+- Android SDK (API level 26 or higher)
 - Internet connection for API data
 
 ### Installation
